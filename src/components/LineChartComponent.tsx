@@ -1,45 +1,36 @@
-
+import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Typography } from '@mui/material';
 
-interface LineChartProps {
-  data: any[]; // Os dados para o gráfico
-  dataKey: string; // O sensor que vamos plotar (ex: "rpm_motor")
+interface ChartProps {
+  data: any[];
+  dataKey: string;
   label: string;
   color: string;
+  isLast: boolean; // Propriedade adicionada
 }
 
-const LineChartComponent = ({ data, dataKey, label, color }: LineChartProps) => {
-  if (!data || data.length === 0) {
-    return <Typography sx={{color: 'white'}}>Carregando dados do gráfico...</Typography>;
-  }
-
+const LineChartComponent = ({ data, dataKey, label }: ChartProps) => {
   return (
-    <div style={{ width: '100%', height: 300 }}>
-       <Typography variant="h6" sx={{ color: 'white', textAlign: 'center' }}>{label}</Typography>
+    <div style={{ width: '100%', height: 300, backgroundColor: '#1E1E1E', padding: '20px', borderRadius: '8px', border: '1px solid #444' }}>
       <ResponsiveContainer>
-        <LineChart
-          data={data}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#555" />
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#444" />
           <XAxis 
-            dataKey="time" 
-            stroke="#ccc"
-            // Formata o timestamp para mostrar apenas HH:mm:ss
-            tickFormatter={(timeStr) => new Date(timeStr).toLocaleTimeString()}
+            dataKey="time"
+            stroke="#AAA"
+            tickFormatter={(timeStr) => new Date(timeStr).toLocaleTimeString()} 
           />
-          <YAxis stroke="#ccc" />
+          <YAxis stroke="#AAA" />
           <Tooltip 
-            contentStyle={{ backgroundColor: '#333', border: '1px solid #555' }}
+            contentStyle={{ backgroundColor: '#111', border: 'none' }} 
             labelStyle={{ color: '#fff' }}
           />
           <Legend />
-          <Line type="monotone" dataKey={dataKey} name={label} stroke={color} dot={false} />
+          <Line type="monotone" dataKey={dataKey} name={label} stroke="#8884d8" dot={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>
   );
 };
 
-export default LineChartComponent;
+export default React.memo(LineChartComponent); // Envolvemos com React.memo para otimização

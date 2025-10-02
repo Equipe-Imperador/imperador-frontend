@@ -1,84 +1,36 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Para redirecionar o usuário
-import { useAuth } from '../context/AuthContext';   // Para usar nossa função de login
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-// A interface que descreve a resposta de sucesso da nossa API
-interface LoginSuccessResponse {
-  message: string;
-  token: string;
-}
-
-const LoginPage = () => {
-  // Hooks que vamos usar
-  const navigate = useNavigate();    // Hook para nos permitir navegar entre páginas
-  const { login } = useAuth();       // Pegamos a função 'login' do nosso AuthContext
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setError(null);
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
     try {
-      // Usamos o NOVO IP da sua VPS
-      const response = await axios.post<LoginSuccessResponse>('http://72.60.141.159:3000/api/users/login', {
-        email,
-        password,
-      });
-
-      if (response.status === 200) {
-        const { token } = response.data;
-        
-        // Usamos a função 'login' do nosso contexto. 
-        // Ela vai salvar o token no localStorage e atualizar o estado global da aplicação.
-        login(token);
-
-        // Navega o usuário para a página principal (o Dashboard)
-        navigate('/');
-      }
+      const response = await axios.post('http://72.60.141.159:3000/api/users/login', { email, password });
+      login(response.data.token);
+      navigate('/');
     } catch (err: any) {
-      if (err.response) {
-        setError(err.response.data.message || 'Erro no login.');
-      } else {
-        setError('Erro de conexão. Verifique sua rede ou o status do servidor.');
-      }
-      console.error('Erro de login:', err);
+      setError(err.response?.data?.message || 'Erro ao fazer login.');
     }
   };
 
   return (
-    <div>
-      <h2>Login - Telemetria Imperador</h2>
-      <form onSubmit={handleSubmit} method="post">
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Senha:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit">Entrar</button>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#121212', fontFamily: 'sans-serif' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '2rem', backgroundColor: '#1E1E1E', borderRadius: '8px', color: 'white' }}>
+        <h2>Telemetria Imperador</h2>
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" required style={{ padding: '0.5rem' }} />
+        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Senha" required style={{ padding: '0.5rem' }} />
+        <button type="submit" style={{ padding: '0.5rem', cursor: 'pointer' }}>Entrar</button>
+        {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
       </form>
     </div>
   );
-};
-
-export default LoginPage;
+}

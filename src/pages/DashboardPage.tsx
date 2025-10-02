@@ -1,145 +1,164 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import MainLayout from '../components/MainLayout';
+import { useTelemetryData } from '../hooks/useTelemetryData';
+import { sendPitCallCommand } from '../services/telemetryService'; 
 import GaugeComponent from '../components/GaugeComponent';
-import LineChartComponent from '../components/LineChartComponent';
-import { getLatestTelemetry, getHistoricalTelemetry } from '../services/telemetryService';
-import { Box, Typography, Button, CircularProgress } from '@mui/material';
+import AlertsPanel from '../components/AlertsPanel';
+import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
+import DatePicker from 'react-datepicker'; 
+import { Link } from 'react-router-dom';
+import { styles, sensorConfig, presets } from 'c:/Baja/imperador-frontend/src/config/dashboardconfig'; 
+import { Box, Button, Typography } from '@mui/material';
 
-// A interface completa que descreve um ponto de telemetria
-interface TelemetryData {
-  time: string;
-  tensao_bateria: number;
-  temperatura_bateria: number;
-  rpm_motor: number;
-  nivel_combustivel: number;
-  velocidade_eixo_traseiro: number;
-  pressao_freio_traseiro: number;
-  pressao_freio_dianteiro: number;
-  temp_cvt: number;
-  // Adicione aqui todos os outros sensores que a API pode retornar
-}
-
-const DashboardPage = () => {
+export default function DashboardPage() {
   const { user, logout } = useAuth();
   
-  // Estados para os dados
-  const [latestData, setLatestData] = useState<Partial<TelemetryData> | null>(null);
-  const [historicalData, setHistoricalData] = useState<TelemetryData[]>([]);
+  const [startDate, setStartDate] = useState(new Date(Date.now() - 60 * 60 * 1000));
+  const [endDate, setEndDate] = useState(new Date());
   
-  // Estados para controle de UI (Loading e Erro)
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { latestData, historicalData, isLoading, error, fetchHistory } = useTelemetryData();
   
-  // Estado para o preset ativo
-  const [preset, setPreset] = useState('powertrain');
+  const [visibleSensors, setVisibleSensors] = useState<string[]>(presets.powertrain);
 
   useEffect(() => {
-    // Função unificada para buscar todos os dados necessários
-    const fetchAllData = async () => {
-      try {
-        setError(null); // Limpa erros antigos a cada nova busca
-        
-        const [latest, history] = await Promise.all([
-          getLatestTelemetry(),
-          getHistoricalTelemetry(
-            new Date(Date.now() - 5 * 60 * 1000).toISOString(), // 5 minutos atrás
-            new Date().toISOString()
-          )
-        ]);
+    fetchHistory(startDate, endDate);
+  }, [fetchHistory]);
 
-        setLatestData(latest);
-        setHistoricalData(history);
-      } catch (err: any) {
-        console.error("Falha ao buscar dados:", err);
-        if (err.response?.status === 401) {
-            setError("Sessão expirada. Por favor, faça o login novamente.");
-            logout(); // Força o logout se o token for inválido
-        } else {
-            setError("Não foi possível carregar os dados. Verifique a conexão com o servidor e se há dados sendo enviados via MQTT.");
-        }
-      } finally {
-        setIsLoading(false); // Marca o carregamento como concluído, mesmo se der erro
-      }
-    };
+  const handleSensorToggle = (sensorId: string) => {
+    setVisibleSensors(prev => 
+      prev.includes(sensorId) ? prev.filter(id => id !== sensorId) : [...prev, sensorId]
+    );
+  };
 
-    fetchAllData(); // Busca os dados a primeira vez
-    
-    // Configura o intervalo para buscar apenas os dados em tempo real a cada segundo
-    const intervalId = setInterval(async () => {
-        try {
-            const latest = await getLatestTelemetry();
-            setLatestData(latest);
-        } catch (err) {
-            console.error("Falha ao buscar dados em tempo real:", err);
-            setError("Conexão com a telemetria em tempo real perdida.");
-        }
-    }, 1000);
+  const handlePresetChange = (presetName: string) => {
+    if (presets[presetName]) {
+      setVisibleSensors(presets[presetName]);
+    }
+  };
+  
+  const handleFetchDataByDate = () => {
+    fetchHistory(startDate, endDate);
+  };
 
-    // Limpa o intervalo quando o componente é desmontado para evitar vazamento de memória
-    return () => clearInterval(intervalId);
-  }, []); // O array vazio garante que isso rode apenas uma vez ao carregar a página
+  const handlePitCall = async () => {
+    try {
+      const response = await sendPitCallCommand();
+      alert(response.message);
+    } catch (err) {
+      alert('Erro ao enviar comando para o box.');
+      console.error(err);
+    }
+  };
 
-  // Função auxiliar para renderizar o conteúdo principal do dashboard
+  const widgetsToShow = sensorConfig.filter(s => visibleSensors.includes(s.id));
+
   const renderContent = () => {
-    if (isLoading) {
-      return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <CircularProgress />
-          <Typography sx={{ color: 'white', ml: 2 }}>Carregando dados...</Typography>
+    if (isLoading) return <Typography>Carregando dados...</Typography>;
+    if (error) return <Typography color="error">ERRO: {error}</Typography>;
+    
+    return (
+      <>
+        <Typography variant="h6" sx={styles.sectionTitle}>Mostradores</Typography>
+        <Box sx={styles.widgetsContainer}>
+          {widgetsToShow.map(widget => (
+            <GaugeComponent
+                key={widget.id + '-gauge'}
+                label={widget.label}
+                value={latestData?.[widget.id] as number ?? 0}
+                unit={widget.unit}
+                maxValue={widget.maxValue || 100}
+            />
+          ))}
         </Box>
-      );
-    }
-
-    if (error) {
-      return <Typography sx={{ color: 'red', mt: 4, textAlign: 'center' }}>{error}</Typography>;
-    }
-
-    if (preset === 'powertrain') {
-      return (
-        <>
-          <Typography variant="h5" sx={{ color: 'white', mt: 2, mb: 2 }}>Preset: Powertrain</Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-            <GaugeComponent value={latestData?.rpm_motor ?? 0} label="RPM" maxValue={9000} />
-            <GaugeComponent value={latestData?.velocidade_eixo_traseiro ?? 0} label="Velocidade" unit="km/h" maxValue={120} />
-            <GaugeComponent value={latestData?.temp_cvt ?? 0} label="Temp. CVT" unit="°C" maxValue={120} />
-          </Box>
-          <Box sx={{mt: 4}}>
-             <LineChartComponent data={historicalData} dataKey="rpm_motor" label="RPM do Motor" color="#8884d8" />
-          </Box>
-        </>
-      );
-    }
-
-    if (preset === 'freios') {
-      return (
-        <>
-          <Typography variant="h5" sx={{ color: 'white', mt: 2, mb: 2 }}>Preset: Freios</Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-            <GaugeComponent value={latestData?.pressao_freio_dianteiro ?? 0} label="Pressão Freio Diant." unit="bar" maxValue={50} />
-            <GaugeComponent value={latestData?.pressao_freio_traseiro ?? 0} label="Pressão Freio Tras." unit="bar" maxValue={50} />
-          </Box>
-           <Box sx={{mt: 4}}>
-             <LineChartComponent data={historicalData} dataKey="pressao_freio_dianteiro" label="Pressão Freio Dianteiro" color="#82ca9d" />
-          </Box>
-        </>
-      );
-    }
-
-    return null; // Caso nenhum preset seja selecionado
+        
+        <Typography variant="h6" sx={styles.sectionTitle}>Gráficos Históricos</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          {widgetsToShow.map((chart, index) => {
+              const isLastChart = index === widgetsToShow.length - 1;
+              return (
+                  <Box key={chart.id + '-graph'} sx={{ width: '100%', height: isLastChart ? 220 : 200 }}>
+                      <ResponsiveContainer>
+                          <LineChart data={historicalData} syncId="telemetrySync" margin={{ top: 10, right: 30, left: 0, bottom: isLastChart ? 5 : 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                              {isLastChart && <XAxis dataKey="time" tickFormatter={(time) => new Date(time).toLocaleTimeString()} stroke="#DDD" />}
+                              <YAxis stroke="#DDD" domain={['auto', 'auto']} />
+                              <Tooltip contentStyle={{ backgroundColor: '#111' }} />
+                              <Legend />
+                              <Line type="monotone" dataKey={chart.id} name={chart.label} stroke={chart.color} dot={false} isAnimationActive={false} />
+                          </LineChart>
+                      </ResponsiveContainer>
+                  </Box>
+              )
+          })}
+        </Box>
+      </>
+    );
   };
 
   return (
-    <MainLayout onPresetChange={setPreset}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        {user && <Typography sx={{ color: 'white' }}>Bem-vindo, {user.email}!</Typography>}
-        <Button variant="contained" color="secondary" onClick={logout}>Sair</Button>
-      </Box>
-      <hr />
-      
-      {renderContent()}
-    </MainLayout>
-  );
-};
+    <div style={styles.pageContainer}>
+      {/* Sidebar */}
+      <aside style={styles.sidebar}>
+        <Typography variant="h6">Controles</Typography>
+        
+        <Typography variant="subtitle1" sx={styles.sectionTitle}>Comandos</Typography>
+        <Button fullWidth variant="outlined" onClick={handlePitCall} sx={{ mb: 1 }}>
+          Chamar para o Box
+        </Button>
 
-export default DashboardPage;
+        <Typography variant="subtitle1" sx={styles.sectionTitle}>Período dos Gráficos</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+          <div>
+            <label>Início:</label>
+            <DatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} showTimeSelect dateFormat="dd/MM/yyyy HH:mm" customInput={<input style={styles.datePickerInput} />} />
+          </div>
+          <div>
+            <label>Fim:</label>
+            <DatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} showTimeSelect dateFormat="dd/MM/yyyy HH:mm" customInput={<input style={styles.datePickerInput} />} />
+          </div>
+          <Button fullWidth variant="outlined" onClick={handleFetchDataByDate}>
+            Buscar Período
+          </Button>
+        </Box>
+
+        <Typography variant="subtitle1" sx={styles.sectionTitle}>Presets</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Button fullWidth variant="outlined" onClick={() => handlePresetChange('powertrain')}>Powertrain</Button>
+          <Button fullWidth variant="outlined" onClick={() => handlePresetChange('freios')}>Freios</Button>
+          <Button fullWidth variant="outlined" onClick={() => handlePresetChange('suspensao')}>Suspensão</Button>
+        </Box>
+
+        <Typography variant="subtitle1" sx={styles.sectionTitle}>Sensores Visíveis</Typography>
+        {sensorConfig.map(sensor => (
+          <Box key={sensor.id} sx={styles.checkboxLabel}>
+            <input type="checkbox" id={sensor.id} checked={visibleSensors.includes(sensor.id)} onChange={() => handleSensorToggle(sensor.id)} style={{ marginRight: '10px' }} />
+            <label htmlFor={sensor.id}>{sensor.label}</label>
+          </Box>
+        ))}
+      </aside>
+
+      {/* Main content */}
+      <div style={styles.mainContent}>
+        <header style={styles.header}>
+          <Typography variant="h4">Dashboard Imperador</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {/* Novo botão de exportação no topo */}
+            <Link to="/export">
+              <Button variant="outlined">Exportar Dados</Button>
+            </Link>
+            <Typography>{user?.email}</Typography>
+            <Button variant="outlined" color="error" onClick={logout}>Sair</Button>
+          </Box>
+        </header>
+        
+        <main>
+          <Box sx={styles.liveDataContainer}>
+            <Typography variant="h6" sx={styles.sectionTitle}>Alertas</Typography>
+            <AlertsPanel data={latestData} />
+          </Box>
+          {renderContent()}
+        </main>
+      </div>
+    </div>
+  );
+}
