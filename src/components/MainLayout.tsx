@@ -1,101 +1,51 @@
-import React, { useState } from 'react';
-import { Box, Drawer, AppBar, Toolbar, Typography, CssBaseline, IconButton, Divider } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu'; // Ícone "Hamburger"
-
-const drawerWidth = 240;
+import React from 'react';
+import { Box, Typography, Button } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 interface MainLayoutProps {
   children: React.ReactNode;
-  drawerContent: React.ReactNode;
+  pageTitle?: string;
 }
 
-const MainLayout = ({ children, drawerContent }: MainLayoutProps) => {
-  const [mobileOpen, setMobileOpen] = useState(false); // Estado para controlar o menu em telas pequenas
-  const [isClosing, setIsClosing] = useState(false);
-
-  const handleDrawerToggle = () => {
-    if (!isClosing) {
-      setMobileOpen(!mobileOpen);
-    }
-  };
-
-  const drawer = (
-    <div>
-      <Toolbar />
-      <Divider />
-      {drawerContent}
-    </div>
-  );
-
+export default function MainLayout({ children, pageTitle }: MainLayoutProps) {
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          backgroundColor: '#1E1E1E',
-          // Em telas maiores, o App Bar fica ao lado do menu. Em menores, fica acima.
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }} // O botão só aparece em telas pequenas (mobile)
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Dashboard de Telemetria
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Box
-        component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="mailbox folders"
-      >
-        {/* Drawer para telas pequenas (temporário, sobrepõe o conteúdo) */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onTransitionEnd={() => setIsClosing(false)}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Melhor performance de abertura em mobile.
-          }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: '#1E1E1E', color: '#FFFFFF' },
-          }}
-        >
-          {drawer}
-        </Drawer>
-        {/* Drawer para telas grandes (permanente, como tínhamos antes) */}
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: '#1E1E1E', color: '#FFFFFF' },
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
-      </Box>
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, backgroundColor: '#121212', minHeight: '100vh' }}
-      >
-        <Toolbar />
-        {children}
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: '#131E33',
+        backgroundImage: 'url(/assets/logo.png)', // fundo da equipe
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          backgroundColor: 'rgba(19,30,51,0.85)', // sobreposição escura
+          zIndex: 0,
+          opacity: 0.07, // logo semi-transparente
+          filter: 'blur(5px)',
+        },
+      }}
+    >
+      <Box sx={{ position: 'relative', zIndex: 1, p: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h4" color="#FFF">{pageTitle}</Typography>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Link to="/">
+              <Button variant="outlined" sx={{ color: '#FFF', borderColor: '#FFF' }}>Dashboard</Button>
+            </Link>
+            <Link to="/export">
+              <Button variant="outlined" sx={{ color: '#FFF', borderColor: '#FFF' }}>Exportar</Button>
+            </Link>
+          </Box>
+        </Box>
+
+        <Box>
+          {children}
+        </Box>
       </Box>
     </Box>
   );
-};
-
-export default MainLayout;
+}

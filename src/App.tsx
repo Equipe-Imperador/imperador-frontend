@@ -15,25 +15,39 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
 function App() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/"
-        element={
-          <PrivateRoute>
-            <DashboardPage />
-          </PrivateRoute>
-        }
-      />
-      {/* 2. ADICIONA A NOVA ROTA PROTEGIDA PARA EXPORTAÇÃO */}
-      <Route
-        path="/export"
-        element={
-          <PrivateRoute>
-            <ExportPage />
-          </PrivateRoute>
-        }
-      />
-    </Routes>
+  <Route path="/login" element={<LoginPage />} />
+
+  {/* Dashboard na raiz */}
+  <Route
+    path="/"
+    element={
+      <PrivateRoute>
+        <DashboardPage />
+      </PrivateRoute>
+    }
+  />
+
+  {/* Dashboard também acessível via /dashboard */}
+  <Route
+    path="/dashboard"
+    element={
+      <PrivateRoute>
+        <DashboardPage />
+      </PrivateRoute>
+    }
+  />
+
+  {/* Exportação */}
+  <Route
+    path="/export"
+    element={
+      <PrivateRoute>
+        <ExportPage />
+      </PrivateRoute>
+    }
+  />
+</Routes>
+
   );
 }
 
