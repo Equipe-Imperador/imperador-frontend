@@ -1,9 +1,16 @@
+// AuthContext.tsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
-interface User { id: string; email: string; role: string; }
+interface User { 
+  id: string; 
+  email: string; 
+  role: 'integrante' | 'juiz'; // Tipando as possíveis roles
+}
+
 interface AuthContextType {
   user: User | null;
+  role: 'integrante' | 'juiz' | null; // Role exposta separadamente
   login: (token: string) => void;
   logout: () => void;
   isAuthenticated: boolean;
@@ -18,7 +25,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (token) {
       try {
-        const decodedUser = jwtDecode<User>(token);
+        const decodedUser = jwtDecode<User>(token); // role vem do token
         setUser(decodedUser);
         localStorage.setItem('authToken', token);
       } catch {
@@ -35,9 +42,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => setToken(null);
 
   const isAuthenticated = !!token;
+  const role = user?.role ?? null;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, role, login, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

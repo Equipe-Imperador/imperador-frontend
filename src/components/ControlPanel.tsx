@@ -5,8 +5,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import DownloadIcon from '@mui/icons-material/Download';
 import SpeedIcon from '@mui/icons-material/Speed';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import { sensorConfig } from 'c:/Baja/imperador-frontend/src/config/dashboardconfig';
-import type { WidgetConfig } from 'c:/Baja/imperador-frontend/src/config/dashboardconfig';
+import { sensorConfig } from 'c:/Baja/imperador-frontend/src/config/dashboardConfig.ts';
 
 interface ControlPanelProps {
   onPresetChange?: (preset: string) => void;

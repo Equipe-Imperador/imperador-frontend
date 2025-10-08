@@ -5,6 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png'; // coloque sua logo em src/assets/logo.png
 import axios from 'axios';
 
+
+
+
+
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -60,7 +64,7 @@ export default function LoginPage() {
           p: 4,
           maxWidth: 400,
           width: '100%',
-          background: 'linear-gradient(to bottom, #00142F, #131E33)',
+          backgroundColor: 'rgba(0, 20, 47, 0.75)',
           borderRadius: 3,
           color: '#FFF',
           display: 'flex',

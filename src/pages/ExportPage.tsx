@@ -9,10 +9,9 @@ import html2canvas from "html2canvas";
 import { createRoot } from 'react-dom/client';
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
 import { useTelemetryData } from '../hooks/useTelemetryData';
-import { sensorConfig } from '../config/dashboardConfig';
+import { sensorConfig, styles } from '../config/dashboardConfig';
 import logo from '../assets/logo.png';
 import "react-datepicker/dist/react-datepicker.css";
-import { styles } from '../config/dashboardConfig';
 
 export default function ExportPage() {
   const { user, logout } = useAuth();
@@ -20,6 +19,7 @@ export default function ExportPage() {
   const [endDate, setEndDate] = useState(new Date());
   const { historicalData, fetchHistory } = useTelemetryData();
 
+  // --- EXPORT CSV ---
   const handleExportCSV = async () => {
     const token = localStorage.getItem('authToken');
     if (!token) return alert("Token não encontrado. Faça login novamente.");
@@ -45,8 +45,9 @@ export default function ExportPage() {
     }
   };
 
+  // --- EXPORT PDF ---
   const handleExportPDF = async () => {
-    await fetchHistory(startDate, endDate); // atualiza historicalData
+    await fetchHistory(startDate, endDate);
     if (!historicalData || historicalData.length === 0) {
       alert("Não há dados para gerar os gráficos.");
       return;
@@ -103,40 +104,52 @@ export default function ExportPage() {
     pdf.save("dashboard_graficos.pdf");
   };
 
+  // --- LAYOUT ---
   return (
-    <div
-      style={{
-        ...styles.pageContainer,
-        minHeight: '100vh',
-        backgroundColor: '#131E33',
-        backgroundImage: `url(${logo})`,
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-        position: 'relative',
-      }}
-    >
-      <div style={{ position: 'relative', zIndex: 1, padding: 20 }}>
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <Typography variant="h4" sx={{ color: '#FFF' }}>Exportar Dados de Telemetria</Typography>
+    <div style={{ position: 'relative', minHeight: '100vh' }}>
+      {/* Fundo com logo e blur */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0, left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundImage: `url(${logo})`,
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: '#131E33',
+          filter: 'blur(2px)',
+          opacity: 1,
+          zIndex: 0
+        }}
+      />
+
+      {/* Conteúdo principal */}
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', color: '#CCC' }}>
+        {/* Cabeçalho igual ao da Dashboard */}
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px', borderBottom: '1px solid #444' }}>
+          <Typography variant="h4" sx={{ color: '#CCC' }}>Exportar Dados</Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Link to="/"><Button variant="outlined" sx={{ color: '#FFF', borderColor: '#FFF' }}>Dashboard</Button></Link>
-            <Typography sx={{ color: '#FFF' }}>{user?.email}</Typography>
+            <Link to="/">
+              <Button variant="outlined" sx={{ color: '#CCC', borderColor: '#CCC' }}>Dashboard</Button>
+            </Link>
+            <Typography sx={{ color: '#CCC' }}>{user?.email}</Typography>
             <Button variant="outlined" color="error" onClick={logout}>Sair</Button>
           </Box>
         </header>
 
-        <main>
-          <Box sx={{ p: 3, maxWidth: 700, backgroundColor: 'rgba(0,20,47,0.85)', borderRadius: 3 }}>
-            <Typography sx={{ color: 'white', mb: 3 }}>
-              Selecione o período desejado e o formato para fazer o download.
-              A exportação em CSV contém os dados brutos de todos os sensores,
-              enquanto o PDF gera um relatório visual com os gráficos.
+        {/* Caixa centralizada */}
+        <main style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+          <Box sx={{ p: 4, width: 600, backgroundColor: 'rgba(0,20,47,0.85)', borderRadius: 3, textAlign: 'center' }}>
+            <Typography sx={{ color: '#CCC', mb: 3, fontSize: '1.1rem' }}>
+              Selecione o período e o formato para exportar os dados de telemetria.
+              O arquivo CSV contém dados brutos, enquanto o PDF gera gráficos detalhados.
             </Typography>
 
             <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
               <Box sx={{ flex: 1 }}>
-                <label style={{ color: 'white' }}>Início:</label>
+                <label style={{ color: '#CCC' }}>Início:</label>
                 <DatePicker
                   selected={startDate}
                   onChange={(date: Date | null) => date && setStartDate(date)}
@@ -146,7 +159,7 @@ export default function ExportPage() {
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
-                <label style={{ color: 'white' }}>Fim:</label>
+                <label style={{ color: '#CCC' }}>Fim:</label>
                 <DatePicker
                   selected={endDate}
                   onChange={(date: Date | null) => date && setEndDate(date)}
@@ -158,8 +171,8 @@ export default function ExportPage() {
             </Box>
 
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button variant="outlined" fullWidth onClick={handleExportCSV} sx={{ color: '#FFF', borderColor: '#FFF' }}>Exportar .CSV</Button>
-              <Button variant="outlined" fullWidth onClick={handleExportPDF} sx={{ color: '#FFF', borderColor: '#FFF' }}>Exportar .PDF</Button>
+              <Button variant="outlined" fullWidth onClick={handleExportCSV} sx={{ color: '#CCC', borderColor: '#CCC' }}>Exportar .CSV</Button>
+              <Button variant="outlined" fullWidth onClick={handleExportPDF} sx={{ color: '#CCC', borderColor: '#CCC' }}>Exportar .PDF</Button>
             </Box>
           </Box>
         </main>
