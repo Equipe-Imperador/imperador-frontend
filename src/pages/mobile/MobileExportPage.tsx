@@ -1,14 +1,14 @@
 // src/pages/mobile/MobileExportPage.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTelemetryData } from '../../hooks/useTelemetryData';
-import { Link, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 import { Box, Typography, Button } from '@mui/material';
 import { sensorConfig } from '../../config/dashboardConfig';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { createRoot } from 'react-dom/client';
-import logo from '../../assets/logo.png';
+
 
 export default function MobileExportPage() {
   const { user, logout } = useAuth();
@@ -23,7 +23,7 @@ export default function MobileExportPage() {
     try {
       const startISO = startDate.toISOString();
       const endISO = endDate.toISOString();
-      const response = await fetch(`http://72.60.141.159:3000/api/telemetry/export?startDate=${startISO}&endDate=${endISO}&format=csv`,
+      const response = await fetch(`/api/telemetry/export?startDate=${startISO}&endDate=${endISO}&format=csv`,
         { headers: { Authorization: `Bearer ${token}` } });
       if (!response.ok) throw new Error('Falha CSV');
       const blob = await response.blob();

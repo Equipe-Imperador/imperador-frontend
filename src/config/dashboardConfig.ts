@@ -42,6 +42,7 @@ export const presets: { [key: string]: string[] } = {
   powertrain: ['rpm_motor', 'velocidade_eixo_traseiro', 'temp_cvt', 'nivel_combustivel','curso_pedal_acelerador',],
   freios: ['velocidade_eixo_traseiro','pressao_freio_dianteiro', 'pressao_freio_traseira', 'temp_freio_dianteiro', 'temp_freio_traseiro','curso_pedal_acelerador', 'curso_pedal_freio'],
   suspensao: ['velocidade_eixo_traseiro','angulo_estercamento','acelerometro_x', 'acelerometro_y', 'acelerometro_z'],
+  todos: sensorConfig.map(s => s.id),
 };
 
 export const styles: { [key: string]: React.CSSProperties } = {

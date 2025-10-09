@@ -22,7 +22,7 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post('http://72.60.141.159:3000/api/users/login', { email, password });
+      const response = await axios.post('/api/users/login', { email, password });
       login(response.data.token);
       navigate('/'); // redireciona para Dashboard após login
     } catch (err: any) {

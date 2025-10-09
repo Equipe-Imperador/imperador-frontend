@@ -1,5 +1,5 @@
 // EXPORT PAGE - ExportPage.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
@@ -28,7 +28,7 @@ export default function ExportPage() {
       const startDateISO = startDate.toISOString();
       const endDateISO = endDate.toISOString();
       const response = await fetch(
-        `http://72.60.141.159:3000/api/telemetry/export?startDate=${startDateISO}&endDate=${endDateISO}&format=csv`,
+        `api/telemetry/export?startDate=${startDateISO}&endDate=${endDateISO}&format=csv`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!response.ok) throw new Error("Falha na exportação CSV");

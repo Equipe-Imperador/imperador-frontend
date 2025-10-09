@@ -1,5 +1,5 @@
 // DASHBOARD PAGE
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTelemetryData } from '../hooks/useTelemetryData';
 import { sendPitCallCommand } from '../services/telemetryService';
@@ -18,7 +18,7 @@ export default function DashboardPage() {
   const [startDate, setStartDate] = useState(new Date(Date.now() - 60 * 60 * 1000));
   const [endDate, setEndDate] = useState(new Date());
 
-  const { latestData, historicalData, isLoading, error, fetchHistory } = useTelemetryData();
+  const { latestData, historicalData, fetchHistory } = useTelemetryData();
 
   const [visibleSensors, setVisibleSensors] = useState<string[]>(presets.powertrain);
 
@@ -65,8 +65,7 @@ export default function DashboardPage() {
   const widgetsToShow = sensorConfig.filter(s => visibleSensors.includes(s.id));
 
   const renderContent = () => {
-    if (isLoading) return <Typography sx={{ color: '#ccc' }}>Carregando dados...</Typography>;
-    if (error) return <Typography sx={{ color: '#ccc' }}>ERRO: {error}</Typography>;
+ 
 
     return (
       <>
@@ -205,6 +204,7 @@ export default function DashboardPage() {
                 <Button fullWidth variant="outlined" onClick={() => handlePresetChange('powertrain')} sx={{ color: '#ccc', borderColor: '#ccc' }}>Powertrain</Button>
                 <Button fullWidth variant="outlined" onClick={() => handlePresetChange('freios')} sx={{ color: '#ccc', borderColor: '#ccc' }}>Freios</Button>
                 <Button fullWidth variant="outlined" onClick={() => handlePresetChange('suspensao')} sx={{ color: '#ccc', borderColor: '#ccc' }}>Suspensão</Button>
+                <Button fullWidth variant="outlined" onClick={() => handlePresetChange('todos')} sx={{ color: '#ccc', borderColor: '#ccc' }}>Todos</Button>
               </Box>
             </>
           )}

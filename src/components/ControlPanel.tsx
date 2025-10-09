@@ -1,4 +1,4 @@
-import React from 'react';
+// src/components/ControlPanel.tsx
 import { List, ListItemButton, ListItemText, Typography, Divider, Checkbox, ListItem } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';

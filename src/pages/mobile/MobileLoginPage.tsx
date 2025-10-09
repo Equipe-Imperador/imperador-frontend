@@ -21,7 +21,7 @@ export default function MobileLoginPage() {
 
     try {
       // 🔗 Requisição para seu backend na VPS
-      const response = await axios.post('http://72.60.141.159:3000/api/users/login', {
+      const response = await axios.post('/api/users/login', {
         email,
         password,
       });

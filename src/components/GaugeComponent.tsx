@@ -3,11 +3,11 @@ import React from 'react';
 // Estilos para o nosso mostrador
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
-    width: '150px',
-    height: '150px',
-    padding: '15px',
+    width: '125px',
+    height: '125px',
+    padding: '12px',
     backgroundColor: '#1E1E1E',
-    borderRadius: '8px',
+    borderRadius: '6px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
