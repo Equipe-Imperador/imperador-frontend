@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTelemetryData } from '../../hooks/useTelemetryData';
 import { sendPitCallCommand } from '../../services/telemetryService';
@@ -21,6 +21,38 @@ export default function MobileDashboardPage() {
   const [visibleSensors, setVisibleSensors] = useState<string[]>(presets.powertrain);
   const [showCharts, setShowCharts] = useState(false); // ✅ novo estado
 
+  const [isRealtime, setIsRealtime] = useState(false);
+  const realtimeIntervalRef = useRef<number | null>(null);
+
+
+  useEffect(() => {
+  if (isRealtime) {
+    const id = window.setInterval(() => {
+      const now = new Date();
+      const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
+      setStartDate(tenMinutesAgo);
+      setEndDate(now);
+      fetchHistory(tenMinutesAgo, now);
+    }, 5000);
+    realtimeIntervalRef.current = id;
+    return () => {
+      if (realtimeIntervalRef.current) {
+        window.clearInterval(realtimeIntervalRef.current);
+        realtimeIntervalRef.current = null;
+      }
+    };
+  } else {
+    if (realtimeIntervalRef.current) {
+      window.clearInterval(realtimeIntervalRef.current);
+      realtimeIntervalRef.current = null;
+    }
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isRealtime, fetchHistory]);
+
+
+
+
   useEffect(() => {
     if (role === 'juiz') {
       const now = new Date();
@@ -32,6 +64,19 @@ export default function MobileDashboardPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchHistory, role]);
+
+
+
+  const handleLast10Minutes = () => {
+    const now = new Date();
+    const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
+    setStartDate(tenMinutesAgo);
+    setEndDate(now);
+    fetchHistory(tenMinutesAgo, now);
+
+    setIsRealtime(true); // ativa refresh contínuo
+};
+
 
   const handleSensorToggle = (sensorId: string) => {
     setVisibleSensors(prev =>
@@ -46,14 +91,6 @@ export default function MobileDashboardPage() {
   const handleFetchDataByDate = () => {
     if (role === 'juiz') return;
     fetchHistory(startDate, endDate);
-  };
-
-  const handleLast10Minutes = () => {
-    const now = new Date();
-    const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
-    setStartDate(tenMinutesAgo);
-    setEndDate(now);
-    fetchHistory(tenMinutesAgo, now);
   };
 
   const handlePitCall = async () => {

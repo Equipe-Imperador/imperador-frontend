@@ -1,5 +1,5 @@
 // DASHBOARD PAGE
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTelemetryData } from '../hooks/useTelemetryData';
 import { sendPitCallCommand } from '../services/telemetryService';
@@ -22,6 +22,41 @@ export default function DashboardPage() {
 
   const [visibleSensors, setVisibleSensors] = useState<string[]>(presets.powertrain);
 
+  const [isRealtime, setIsRealtime] = useState(false);
+  const realtimeIntervalRef = useRef<number | null>(null);
+
+
+  useEffect(() => {
+  // ativa/deativa o intervalo quando isRealtime muda
+  if (isRealtime) {
+    // intervalo a cada 5 segundos (ajuste se quiser mais/menos frequente)
+    const id = window.setInterval(() => {
+      const now = new Date();
+      const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
+      setStartDate(tenMinutesAgo);
+      setEndDate(now);
+      fetchHistory(tenMinutesAgo, now);
+    }, 5000);
+    realtimeIntervalRef.current = id;
+    return () => {
+      if (realtimeIntervalRef.current) {
+        window.clearInterval(realtimeIntervalRef.current);
+        realtimeIntervalRef.current = null;
+      }
+    };
+  } else {
+    // se desativou, limpa qualquer intervalo
+    if (realtimeIntervalRef.current) {
+      window.clearInterval(realtimeIntervalRef.current);
+      realtimeIntervalRef.current = null;
+    }
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isRealtime, fetchHistory]);
+
+
+
+
   useEffect(() => {
     // Limitar histórico para juízes: 7 dias
     if (role === 'juiz') {
@@ -43,14 +78,20 @@ export default function DashboardPage() {
   const handlePresetChange = (presetName: string) => {
     if (presets[presetName]) {
       setVisibleSensors(presets[presetName]);
+      setIsRealtime(true); // Ativa modo realtime ao mudar preset
     }
   };
 
   const handleFetchDataByDate = () => {
-    // juízes não podem alterar período, ignora
-    if (role === 'juiz') return;
-    fetchHistory(startDate, endDate);
-  };
+  // se estivermos em modo realtime, pare
+  if (isRealtime) {
+    setIsRealtime(false);
+  }
+  // juízes: você já tem proteção para não alterar período
+  if (role === 'juiz') return;
+  fetchHistory(startDate, endDate);
+};
+
 
   const handlePitCall = async () => {
     try {
@@ -189,9 +230,15 @@ export default function DashboardPage() {
                   onClick={() => {
                     const now = new Date();
                     const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
-                    setStartDate(tenMinutesAgo);
-                    setEndDate(now);
-                    fetchHistory(tenMinutesAgo, now);
+                     // Atualiza período atual
+                      setStartDate(tenMinutesAgo);
+                      setEndDate(now);
+
+                    // Faz busca imediata
+                      fetchHistory(tenMinutesAgo, now);
+
+                    // Ativa modo tempo real (refresh automático)
+                      setIsRealtime(true);
                   }}
                   sx={{ color: '#ccc', borderColor: '#ccc' }}
                 >
