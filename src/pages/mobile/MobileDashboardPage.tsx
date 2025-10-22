@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTelemetryData } from '../../hooks/useTelemetryData';
-import { sendPitCallCommand } from '../../services/telemetryService';
+//import { sendPitCallCommand } from '../../services/telemetryService';
 import GaugeComponent from '../../components/GaugeComponent';
 import AlertsPanel from '../../components/AlertsPanel';
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { sensorConfig, presets } from '../../config/dashboardConfig';
 import { Box, Button, Typography } from '@mui/material';
+import PitCallButton from '../../components/PitCallButton';
+
 
 export default function MobileDashboardPage() {
   const { user, logout } = useAuth();
@@ -93,7 +95,7 @@ export default function MobileDashboardPage() {
     fetchHistory(startDate, endDate);
   };
 
-  const handlePitCall = async () => {
+ /*const handlePitCall = async () => {
     try {
       const response = await sendPitCallCommand();
       alert(response.message);
@@ -101,7 +103,7 @@ export default function MobileDashboardPage() {
       alert('Erro ao enviar comando para o box.');
       console.error(err);
     }
-  };
+  };*/
 
   const widgetsToShow = sensorConfig.filter(s => visibleSensors.includes(s.id));
 
@@ -133,14 +135,7 @@ export default function MobileDashboardPage() {
               Exportar
             </Button>
             
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={handlePitCall}
-              sx={{ mb: 1, color: '#ccc', borderColor: '#ccc' }}
-            >
-              Chamar para o Box
-            </Button>
+            <PitCallButton />
 
             {/* Date pickers */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1 }}>

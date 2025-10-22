@@ -1,8 +1,9 @@
 // DASHBOARD PAGE
 import { useState, useEffect, useRef } from 'react';
+import PitCallButton from '../components/PitCallButton';
 import { useAuth } from '../context/AuthContext';
 import { useTelemetryData } from '../hooks/useTelemetryData';
-import { sendPitCallCommand } from '../services/telemetryService';
+//import { sendPitCallCommand } from '../services/telemetryService';
 import GaugeComponent from '../components/GaugeComponent';
 import AlertsPanel from '../components/AlertsPanel';
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
@@ -93,7 +94,7 @@ export default function DashboardPage() {
 };
 
 
-  const handlePitCall = async () => {
+  /*const handlePitCall = async () => {
     try {
       const response = await sendPitCallCommand();
       alert(response.message);
@@ -101,7 +102,7 @@ export default function DashboardPage() {
       alert('Erro ao enviar comando para o box.');
       console.error(err);
     }
-  };
+  };*/
 
   const widgetsToShow = sensorConfig.filter(s => visibleSensors.includes(s.id));
 
@@ -192,10 +193,8 @@ export default function DashboardPage() {
           {/* Comandos e presets visíveis apenas para integrantes */}
           {role === 'integrante' && (
             <>
-              <Typography variant="subtitle1" sx={{ ...styles.sectionTitle, color: '#ccc' }}>Comandos</Typography>
-              <Button fullWidth variant="outlined" onClick={handlePitCall} sx={{ mb: 1, color: '#ccc', borderColor: '#ccc' }}>
-                Chamar para o Box
-              </Button>
+              <PitCallButton />
+
 
               <Typography variant="subtitle1" sx={{ ...styles.sectionTitle, color: '#ccc' }}>Período dos Gráficos</Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>

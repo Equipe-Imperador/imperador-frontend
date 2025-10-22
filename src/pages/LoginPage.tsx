@@ -23,7 +23,11 @@ export default function LoginPage() {
     setError('');
     try {
       const response = await axios.post('/api/users/login', { email, password });
+      
+      localStorage.setItem("token", response.data.token);
+      
       login(response.data.token);
+      
       navigate('/'); // redireciona para Dashboard após login
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao fazer login.');
