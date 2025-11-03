@@ -43,7 +43,7 @@ export default function ChartsSection({ data, sensors }: ChartsSectionProps) {
               />
               <YAxis stroke="#ccc" tick={{ fontSize: 10 }} />
               <Tooltip contentStyle={{ backgroundColor: '#222', color: '#ccc' }} />
-              <Legend wrapperStyle={{ fontSize: 10, color: '#ccc' }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: '#ccc' }} />
               <Line
                 type="monotone"
                 dataKey={sensor.id}

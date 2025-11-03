@@ -15,10 +15,11 @@ export interface WidgetConfig {
 
 // A "lista mestre" de todos os sensores
 export const sensorConfig: WidgetConfig[] = [
-  { id: 'rpm_motor', label: 'RPM', unit: 'rpm', maxValue: 9000, color: '#8884d8' },
-  { id: 'velocidade_eixo_traseiro', label: 'Velocidade', unit: 'km/h', maxValue: 120, color: '#82ca9d' },
-  { id: 'temp_cvt', label: 'Temp. CVT', unit: '°C', maxValue: 120, color: '#ffc658' },
+  { id: 'rpm_motor', label: 'RPM', unit: 'rpm', maxValue: 9000, color: '#f30000ff' },
+  { id: 'velocidade_eixo_traseiro', label: 'Velocidade', unit: 'km/h', maxValue: 120, color: '#ffc400ff' },
+  { id: 'temp_cvt', label: 'Temp. CVT', unit: '°C', maxValue: 120, color: '#04f591ff' },
   { id: 'tensao_bateria', label: 'Tensão Bateria', unit: 'V', maxValue: 15, color: '#ff7300' },
+  { id: 'corrente_bateria', label: 'Corrente Bateria', unit: 'A', maxValue: 200, color: '#ff00ddff' },
   { id: 'pressao_freio_dianteiro', label: 'Pressão Freio Diant.', unit: 'bar', maxValue: 100, color: '#0088FE' },
   { id: 'pressao_freio_traseira', label: 'Pressão Freio Tras.', unit: 'bar', maxValue: 100, color: '#00C49F' },
   { id: 'temp_freio_dianteiro', label: 'Temp. Freio Diant.', unit: '°C', maxValue: 500, color: '#FFBB28' },
@@ -28,7 +29,7 @@ export const sensorConfig: WidgetConfig[] = [
   { id: 'velocidade_dianteiro_esq', label: 'Velocidade Diant. Esq', unit: 'km/h', maxValue: 120, color: '#FF66CC' },
   { id: 'velocidade_dianteiro_dir', label: 'Velocidade Diant. Dir', unit: 'km/h', maxValue: 120, color: '#66CCFF' },
   { id: 'temp_oleo_caixa', label: 'Temp. Óleo Caixa', unit: '°C', maxValue: 150, color: '#FF9933' },
-  { id: 'pressao_cvt', label: 'Pressão CVT', unit: 'bar', maxValue: 100, color: '#33FF99' },
+  { id: 'pressao_cvt', label: 'Pressão CVT', unit: 'bar', maxValue: 100, color: '#80a53cff' },
   { id: 'curso_pedal_acelerador', label: 'Pedal Acelerador', unit: '%', maxValue: 100, color: '#3399FF' },
   { id: 'curso_pedal_freio', label: 'Pedal Freio', unit: '%', maxValue: 100, color: '#FF3333' },
   { id: 'angulo_estercamento', label: 'Esterçamento', unit: '°', maxValue: 45, color: '#CC33FF' },

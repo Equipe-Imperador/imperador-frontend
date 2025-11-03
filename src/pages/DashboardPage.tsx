@@ -108,7 +108,6 @@ export default function DashboardPage() {
 
   const renderContent = () => {
  
-
     return (
       <>
         <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc' }}>Mostradores</Typography>
@@ -154,6 +153,7 @@ export default function DashboardPage() {
                       stroke={chart.color}
                       dot={false}
                       isAnimationActive={false}
+                      strokeWidth={2}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -166,26 +166,27 @@ export default function DashboardPage() {
   };
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', color: '#ccc' }}>
+    <div style={{ position: 'relative', minHeight: '100vh', color: '#131E33' }}>
       {/* Fundo com logo */}
       <div
         style={{
-          position: 'absolute',
-          top: 0, left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundImage: `url(${logo})`,
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundColor: '#131E33',
-          filter: 'blur(3px)',
-          opacity: 1,
-          zIndex: 0
-        }}
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#131E33', // Cor sólida primeiro
+    backgroundImage: `url(${logo})`,
+    backgroundSize: '90%',  // Mantém proporção da logo
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center top 200px', // move a imagem um pouco pra baixo se quiser
+    filter: 'blur(3px)',
+    opacity: 1,
+    zIndex: 0,
+  }}
       />
 
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', minHeight: '100vh', color: '#ccc' }}>
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', minHeight: '100vh', color: '#131E33' }}>
         {/* Sidebar */}
         <aside style={{ ...styles.sidebar, color: '#ccc' }}>
           <Typography variant="h6" sx={{ color: '#ccc' }}>Controles</Typography>

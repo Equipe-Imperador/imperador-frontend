@@ -9,7 +9,7 @@ interface ChartProps {
   isLast: boolean; // Propriedade adicionada
 }
 
-const LineChartComponent = ({ data, dataKey, label }: ChartProps) => {
+const LineChartComponent = ({ data, dataKey, label, color }: ChartProps) => {
   return (
     <div style={{ width: '100%', height: 300, backgroundColor: '#1E1E1E', padding: '20px', borderRadius: '8px', border: '1px solid #444' }}>
       <ResponsiveContainer>
@@ -26,7 +26,15 @@ const LineChartComponent = ({ data, dataKey, label }: ChartProps) => {
             labelStyle={{ color: '#fff' }}
           />
           <Legend />
-          <Line type="monotone" dataKey={dataKey} name={label} stroke="#8884d8" dot={false} />
+          <Line 
+            type="monotone" 
+            dataKey={dataKey} 
+            name={label} 
+            stroke={color} 
+            dot={false} 
+            isAnimationActive={false}
+            strokeWidth={2} // <-- A CORREÇÃO ESTÁ AQUI
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>

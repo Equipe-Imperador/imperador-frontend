@@ -110,19 +110,20 @@ export default function ExportPage() {
       {/* Fundo com logo e blur */}
       <div
         style={{
-          position: 'absolute',
-          top: 0, left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundImage: `url(${logo})`,
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundColor: '#131E33',
-          filter: 'blur(2px)',
-          opacity: 1,
-          zIndex: 0
-        }}
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#131E33', // Cor sólida primeiro
+    backgroundImage: `url(${logo})`,
+    backgroundSize: '90%',  // Mantém proporção da logo
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center top 200px', // move a imagem um pouco pra baixo se quiser
+    filter: 'blur(3px)',
+    opacity: 1,
+    zIndex: 0,
+  }}
       />
 
       {/* Conteúdo principal */}
