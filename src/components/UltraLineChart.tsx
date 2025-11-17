@@ -6,7 +6,8 @@ interface UltraLineChartProps {
   data: any[];
   dataKey: string;
   label: string;
-  color: string;
+  color?: string;
+
 }
 
 const UltraLineChart: React.FC<UltraLineChartProps> = ({ data, dataKey, label, color }) => {

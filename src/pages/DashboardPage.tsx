@@ -25,6 +25,8 @@ export default function DashboardPage() {
 
   const [isRealtime, setIsRealtime] = useState(false);
   const realtimeIntervalRef = useRef<number | null>(null);
+  const [realtimeData, setRealtimeData] = useState<any[]>([]);
+
 
 
   useEffect(() => {
@@ -69,6 +71,20 @@ export default function DashboardPage() {
       fetchHistory(startDate, endDate);
     }
   }, [fetchHistory, role]);
+
+
+  useEffect(() => {
+  if (!latestData || !latestData.time) return;
+
+  setRealtimeData(prev => {
+    const MAX = 300;
+    const updated = [...prev, latestData];
+    return updated.slice(-MAX);
+  });
+}, [latestData]);
+
+
+
 
   const handleSensorToggle = (sensorId: string) => {
     setVisibleSensors(prev =>
@@ -131,7 +147,7 @@ export default function DashboardPage() {
               <Box key={chart.id + '-graph'} sx={{ width: '100%', height: isLastChart ? 220 : 200 }}>
                 <ResponsiveContainer>
                   <LineChart
-                    data={historicalData}
+                    data={isRealtime ? realtimeData : historicalData}
                     syncId="telemetrySync"
                     margin={{ top: 10, right: 30, left: 0, bottom: isLastChart ? 5 : 0 }}
                   >

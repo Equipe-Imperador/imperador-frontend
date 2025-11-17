@@ -19,6 +19,8 @@ export default function MobileDashboardPage() {
   const [startDate, setStartDate] = useState(new Date(Date.now() - 60 * 60 * 1000));
   const [endDate, setEndDate] = useState(new Date());
   const { latestData, historicalData, fetchHistory } = useTelemetryData();
+  const [realtimeData, setRealtimeData] = useState<any[]>([]);
+
 
   const [visibleSensors, setVisibleSensors] = useState<string[]>(presets.powertrain);
   const [showCharts, setShowCharts] = useState(false); // ✅ novo estado
@@ -51,6 +53,17 @@ export default function MobileDashboardPage() {
   }
 // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [isRealtime, fetchHistory]);
+
+useEffect(() => {
+  if (!latestData || !latestData.time) return;
+
+  setRealtimeData(prev => {
+    const MAX = 300;
+    const updated = [...prev, latestData];
+    return updated.slice(-MAX);
+  });
+}, [latestData]);
+
 
 
 
@@ -313,7 +326,7 @@ export default function MobileDashboardPage() {
               }}
             >
               <ResponsiveContainer>
-                <LineChart data={historicalData}>
+                <LineChart data={isRealtime ? realtimeData : historicalData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                   <XAxis
                     dataKey="time"
