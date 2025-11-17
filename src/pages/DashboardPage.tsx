@@ -223,26 +223,26 @@ export default function DashboardPage() {
                   Buscar Período
                 </Button>
 
-                {/* Botão Últimos 10 minutos */}
+                {/* Botão Últimos 3 minutos */}
                 <Button
                   fullWidth
                   variant="outlined"
                   onClick={() => {
                     const now = new Date();
-                    const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
+                    const threeMinutesAgo = new Date(now.getTime() - 3 * 60 * 1000);
                      // Atualiza período atual
-                      setStartDate(tenMinutesAgo);
+                      setStartDate(threeMinutesAgo);
                       setEndDate(now);
 
                     // Faz busca imediata
-                      fetchHistory(tenMinutesAgo, now);
+                      fetchHistory(threeMinutesAgo, now);
 
                     // Ativa modo tempo real (refresh automático)
                       setIsRealtime(true);
                   }}
                   sx={{ color: '#ccc', borderColor: '#ccc' }}
                 >
-                  Últimos 10 minutos
+                  Últimos 3 minutos
                 </Button>
               </Box>
 

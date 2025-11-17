@@ -31,10 +31,10 @@ export default function MobileDashboardPage() {
   if (isRealtime) {
     const id = window.setInterval(() => {
       const now = new Date();
-      const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
-      setStartDate(tenMinutesAgo);
+      const threeMinutesAgo = new Date(now.getTime() - 3 * 60 * 1000);
+      setStartDate(threeMinutesAgo);
       setEndDate(now);
-      fetchHistory(tenMinutesAgo, now);
+      fetchHistory(threeMinutesAgo, now);
     }, 5000);
     realtimeIntervalRef.current = id;
     return () => {
@@ -69,9 +69,9 @@ export default function MobileDashboardPage() {
 
 
 
-  const handleLast10Minutes = () => {
+  const handleLast3Minutes = () => {
     const now = new Date();
-    const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
+    const tenMinutesAgo = new Date(now.getTime() - 3 * 60 * 1000);
     setStartDate(tenMinutesAgo);
     setEndDate(now);
     fetchHistory(tenMinutesAgo, now);
@@ -178,10 +178,10 @@ export default function MobileDashboardPage() {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={handleLast10Minutes}
+                onClick={handleLast3Minutes}
                 sx={{ color: '#ccc', borderColor: '#ccc' }}
               >
-                Últimos 10 Minutos
+                Últimos 3 Minutos
               </Button>
             </Box>
 

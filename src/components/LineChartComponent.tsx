@@ -1,4 +1,4 @@
-import React from 'react';
+/*import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface ChartProps {
@@ -27,7 +27,7 @@ const LineChartComponent = ({ data, dataKey, label, color }: ChartProps) => {
           />
           <Legend />
           <Line 
-            type="monotone" 
+            type="monotone"  
             dataKey={dataKey} 
             name={label} 
             stroke={color} 
@@ -41,4 +41,4 @@ const LineChartComponent = ({ data, dataKey, label, color }: ChartProps) => {
   );
 };
 
-export default React.memo(LineChartComponent); // Envolvemos com React.memo para otimização
+export default React.memo(LineChartComponent); // Envolvemos com React.memo para otimização*/
