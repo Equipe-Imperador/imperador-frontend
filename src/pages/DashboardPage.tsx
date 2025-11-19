@@ -14,7 +14,7 @@ import { Box, Button, Typography } from '@mui/material';
 import logo from '../assets/logo.png';
 
 export default function DashboardPage() {
-  const { user, role, logout } = useAuth(); // adicionado role
+  const { user, role, logout } = useAuth();
 
   const [startDate, setStartDate] = useState(new Date(Date.now() - 60 * 60 * 1000));
   const [endDate, setEndDate] = useState(new Date());
@@ -27,6 +27,12 @@ export default function DashboardPage() {
   const realtimeIntervalRef = useRef<number | null>(null);
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
 
+
+  useEffect(() => {
+    if (role === "juiz") {
+      setIsRealtime(false);
+    }
+  }, [role]);// garante que juiz nunca esteja em realtime
 
 
   useEffect(() => {
@@ -64,9 +70,9 @@ export default function DashboardPage() {
     // Limitar histórico para juízes: 7 dias
     if (role === 'juiz') {
       const now = new Date();
-      setStartDate(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)); // 7 dias atrás
+      setStartDate(new Date(now.getTime() -   3 * 60 * 1000)); // 7 dias atrás
       setEndDate(now);
-      fetchHistory(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), now);
+      fetchHistory(new Date(now.getTime() - 3 * 60 * 1000), now);
     } else {
       fetchHistory(startDate, endDate);
     }
@@ -123,7 +129,41 @@ export default function DashboardPage() {
   const widgetsToShow = sensorConfig.filter(s => visibleSensors.includes(s.id));
 
   const renderContent = () => {
- 
+    if (!widgetsToShow || widgetsToShow.length === 0) {
+  return (
+    <Typography sx={{ color: "#ccc", textAlign: "center", mt: 4 }}>
+      Nenhum sensor selecionado.
+    </Typography>
+  );
+}
+
+const chartData = isRealtime ? realtimeData : historicalData;
+
+if (!chartData || chartData.length === 0) {
+  return (
+    <>
+      <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc' }}>
+        Mostradores
+      </Typography>
+
+      <Box sx={styles.widgetsContainer}>
+        {widgetsToShow.map(widget => (
+          <GaugeComponent
+            key={widget.id + '-gauge'}
+            label={widget.label}
+            value={latestData?.[widget.id] as number ?? 0}
+            unit={widget.unit}
+            maxValue={widget.maxValue || 100}
+          />
+        ))}
+      </Box>
+
+      <Typography sx={{ color: "#ccc", textAlign: "center", mt: 4 }}>
+        Carregando dados...
+      </Typography>
+    </>
+  );
+}
     return (
       <>
         <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc' }}>Mostradores</Typography>
@@ -145,6 +185,7 @@ export default function DashboardPage() {
             const isLastChart = index === widgetsToShow.length - 1;
             return (
               <Box key={chart.id + '-graph'} sx={{ width: '100%', height: isLastChart ? 220 : 200 }}>
+                {chartData.length > 0 && (
                 <ResponsiveContainer>
                   <LineChart
                     data={isRealtime ? realtimeData : historicalData}
@@ -173,6 +214,7 @@ export default function DashboardPage() {
                     />
                   </LineChart>
                 </ResponsiveContainer>
+                )}
               </Box>
             );
           })}

@@ -1,3 +1,4 @@
+//dashboardpage mobile
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTelemetryData } from '../../hooks/useTelemetryData';
@@ -27,6 +28,15 @@ export default function MobileDashboardPage() {
 
   const [isRealtime, setIsRealtime] = useState(false);
   const realtimeIntervalRef = useRef<number | null>(null);
+
+
+  
+    useEffect(() => {
+      if (role === "juiz") {
+        setIsRealtime(false);
+      }
+    }, [role]);// garante que juiz nunca esteja em realtime
+  
 
 
   useEffect(() => {
