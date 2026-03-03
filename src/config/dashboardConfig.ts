@@ -15,41 +15,76 @@ export interface WidgetConfig {
 
 // todos os sensores
 export const sensorConfig: WidgetConfig[] = [
-  { id: 'rpm_motor', label: 'RPM', unit: 'rpm', maxValue: 9000, color: '#f30000ff' },
-  { id: 'velocidade_eixo_traseiro', label: 'Velocidade', unit: 'km/h', maxValue: 120, color: '#ffc400ff' },
-  { id: 'temp_cvt', label: 'Temp. CVT', unit: '°C', maxValue: 120, color: '#04f591ff' },
-  { id: 'tensao_bateria', label: 'Tensão Bateria', unit: 'V', maxValue: 15, color: '#ff7300' },
-  { id: 'corrente_bateria', label: 'Corrente Bateria', unit: 'A', maxValue: 200, color: '#ff00ddff' },
-  { id: 'pressao_freio_dianteiro', label: 'Pressão Freio Diant.', unit: 'bar', maxValue: 100, color: '#0088FE' },
-  { id: 'pressao_freio_traseira', label: 'Pressão Freio Tras.', unit: 'bar', maxValue: 100, color: '#00C49F' },
-  //{ id: 'temp_freio_dianteiro', label: 'Temp. Freio Diant.', unit: '°C', maxValue: 500, color: '#FFBB28' },
-  //{ id: 'temp_freio_traseiro', label: 'Temp. Freio Tras.', unit: '°C', maxValue: 500, color: '#FF8042' },
-  { id: 'temperatura_bateria', label: 'Temp. Bateria', unit: '°C', maxValue: 100, color: '#FF6666' },
-  //{ id: 'nivel_combustivel', label: 'Nível Combustível', unit: '%', maxValue: 100, color: '#66FF66' },
-  //{ id: 'velocidade_dianteiro', label: 'Velocidade Diant.', unit: 'km/h', maxValue: 120, color: '#FF66CC' },
-  //{ id: 'velocidade_dianteiro_dir', label: 'Velocidade Diant. Dir', unit: 'km/h', maxValue: 120, color: '#66CCFF' },
-  //{ id: 'temp_oleo_caixa', label: 'Temp. Óleo Caixa', unit: '°C', maxValue: 150, color: '#FF9933' },
-  //{ id: 'pressao_cvt', label: 'Pressão CVT', unit: 'bar', maxValue: 100, color: '#80a53cff' },
-  { id: 'curso_pedal_acelerador', label: 'Pedal Acelerador', unit: '%', maxValue: 100, color: '#3399FF' },
-  { id: 'curso_pedal_freio', label: 'Pedal Freio', unit: '%', maxValue: 100, color: '#FF3333' },
-  //{ id: 'angulo_estercamento', label: 'Esterçamento', unit: '°', maxValue: 45, color: '#CC33FF' },
-  { id: 'acelerometro_x', label: 'Acelerômetro X', unit: 'g', maxValue: 10, color: '#33FFCC' },
-  { id: 'acelerometro_y', label: 'Acelerômetro Y', unit: 'g', maxValue: 10, color: '#FFCC33' },
-  { id: 'acelerometro_z', label: 'Acelerômetro Z', unit: 'g', maxValue: 10, color: '#CCCCCC' },
-  { id: 'gyro_x', label: 'Giroscópio X', unit: '°/s', maxValue: 500, color: '#33FFCC' },
-  { id: 'gyro_y', label: 'Giroscópio Y', unit: '°/s', maxValue: 500, color: '#FFCC33' },
-  { id: 'gyro_z', label: 'Giroscópio Z', unit: '°/s', maxValue: 500, color: '#CCCCCC' },
-  { id: 'ang_x', label: 'Ângulo X (Pitch)', unit: '°', maxValue: 180, color: '#FF6666' },
-  { id: 'ang_y', label: 'Ângulo Y (Roll)', unit: '°', maxValue: 180, color: '#66FF66' },
-  { id: 'ang_z', label: 'Ângulo Z (Yaw)', unit: '°', maxValue: 360, color: '#66CCFF' },
+  // --- DADOS DO MOTOR E TRANSMISSÃO ---
+  { id: 'rpm', label: 'RPM', unit: 'rpm', maxValue: 9000, color: '#f30000ff' },
+  { id: 'vel', label: 'Velocidade Tras.', unit: 'km/h', maxValue: 120, color: '#ffc400ff' },
+  { id: 'tCVT', label: 'Temp. CVT', unit: '°C', maxValue: 120, color: '#04f591ff' },
   { id: 'dif', label: 'Diferencial', unit: 'Status', maxValue: 1, color: '#a53c8cff' },
+
+  // --- DADOS ELÉTRICOS ---
+  { id: 'vBat', label: 'Tensão Bateria', unit: 'V', maxValue: 15, color: '#ff7300' },
+  { id: 'tBat', label: 'Temp. Bateria', unit: '°C', maxValue: 100, color: '#FF6666' },
+
+  // --- DINÂMICA E FREIOS ---
+  { id: 'pDiant', label: 'Pressão Freio Diant.', unit: 'bar', maxValue: 100, color: '#0088FE' },
+  { id: 'pTras', label: 'Pressão Freio Tras.', unit: 'bar', maxValue: 100, color: '#00C49F' },
+  { id: 'pCM', label: 'Pressão Cil. Mestre', unit: 'bar', maxValue: 100, color: '#80a53cff' },
+  { id: 'vLF', label: 'Velocidade Diant. Esq.', unit: 'km/h', maxValue: 120, color: '#FF66CC' },
+  { id: 'vRF', label: 'Velocidade Diant. Dir.', unit: 'km/h', maxValue: 120, color: '#66CCFF' },
+
+  // --- PEDAIS ---
+  { id: 'perT', label: 'Pedal Acelerador', unit: '%', maxValue: 100, color: '#3399FF' },
+  { id: 'perF', label: 'Curso Freio', unit: '%', maxValue: 100, color: '#FF3333' },
+  { id: 'pedF', label: 'Força Pedal Freio', unit: 'kgf', maxValue: 100, color: '#ff00ddff' }, 
+
+  // --- ACELERÔMETRO ---
+  { id: 'accX', label: 'Acelerômetro X', unit: 'g', maxValue: 10, color: '#33FFCC' },
+  { id: 'accY', label: 'Acelerômetro Y', unit: 'g', maxValue: 10, color: '#FFCC33' },
+  { id: 'accZ', label: 'Acelerômetro Z', unit: 'g', maxValue: 10, color: '#CCCCCC' },
+
+  // --- SENSORES ANTIGOS DESATIVADOS NO ESP32 ---
+  //{ id: 'corrente_bateria', label: 'Corrente Bateria', unit: 'A', maxValue: 200, color: '#ff00ddff' },
+  //{ id: 'gyro_x', label: 'Giroscópio X', unit: '°/s', maxValue: 500, color: '#33FFCC' },
+  //{ id: 'gyro_y', label: 'Giroscópio Y', unit: '°/s', maxValue: 500, color: '#FFCC33' },
+  //{ id: 'gyro_z', label: 'Giroscópio Z', unit: '°/s', maxValue: 500, color: '#CCCCCC' },
+  //{ id: 'ang_x', label: 'Ângulo X (Pitch)', unit: '°', maxValue: 180, color: '#FF6666' },
+  //{ id: 'ang_y', label: 'Ângulo Y (Roll)', unit: '°', maxValue: 180, color: '#66FF66' },
+  //{ id: 'ang_z', label: 'Ângulo Z (Yaw)', unit: '°', maxValue: 360, color: '#66CCFF' },
 ];
 
 // A definição dos presets
 export const presets: { [key: string]: string[] } = {
-  powertrain: ['rpm_motor', 'velocidade_eixo_traseiro', 'temp_cvt', 'nivel_combustivel','curso_pedal_acelerador',],
-  freios: ['velocidade_eixo_traseiro','pressao_freio_dianteiro', 'pressao_freio_traseira', 'temp_freio_dianteiro', 'temp_freio_traseiro','curso_pedal_acelerador', 'curso_pedal_freio'],
-  suspensao: ['velocidade_eixo_traseiro','angulo_estercamento','acelerometro_x', 'acelerometro_y', 'acelerometro_z','gyro_x', 'gyro_y', 'gyro_z', 'ang_x' ,'ang_y', 'ang_z' ],
+  powertrain: [
+    'rpm', 
+    'vel', 
+    'tCVT', 
+    'perT', 
+    'dif' // O status do diferencial entra bem aqui
+  ],
+  freios: [
+    'vel', 
+    'vLF', // Velocidade roda Esquerda (ajuda a ver travamento)
+    'vRF', // Velocidade roda Direita
+    'pDiant', 
+    'pTras', 
+    'pCM', // Pressão do Cilindro Mestre
+    'perT', 
+    'perF', // Curso do freio
+    'pedF'  // Força no pedal
+  ],
+  suspensao: [
+    'vel', 
+    'vLF', 
+    'vRF', 
+    'accX', 
+    'accY', 
+    'accZ'
+    // Giroscópio, ângulos e esterçamento foram removidos pois não vêm mais do ESP32
+  ],
+  eletrica: [
+    'vBat', 
+    'tBat'
+  ],
   todos: sensorConfig.map(s => s.id),
 };
 

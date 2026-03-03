@@ -36,10 +36,17 @@ interface GaugeProps {
   maxValue: number; // Propriedade adicionada
 }
 const GaugeComponent = ({ label, value, unit }: GaugeProps) => {
+  // Converte para número por segurança e define 0 se falhar
+  const numericValue = typeof value === 'number' ? value : parseFloat(value as any);
+  const displayValue = isNaN(numericValue) ? 0 : numericValue;
+
   return (
     <div style={styles.container}>
       <div style={styles.label}>{label}</div>
-      <div style={styles.value}>{(value ?? 0).toFixed(1)}</div>
+      <div style={styles.value}>
+        {/* Se for status (0 ou 1), talvez você nem queira casas decimais */}
+        {unit === 'Status' ? displayValue : displayValue.toFixed(1)}
+      </div>
       <div style={styles.unit}>{unit}</div>
     </div>
   );
