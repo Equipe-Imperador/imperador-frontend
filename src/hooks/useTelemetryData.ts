@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 export interface TelemetryData {
   time: string;
+  isOld?: boolean;
   [key: string]: any;
 }
 
@@ -17,30 +18,35 @@ export const useTelemetryData = () => {
   const fetchHistory = useCallback(async (startDate: Date, endDate: Date) => {
     try {
       setIsLoading(true);
-      setError(null);
       const data = await getHistoricalTelemetry(startDate.toISOString(), endDate.toISOString());
       setHistoricalData(data);
     } catch (err: any) {
-      if (err.response?.status === 401) {
-        setError("Sessão expirada. Faça o login novamente.");
-        logout();
-      } else {
-        setError("Não foi possível carregar o histórico.");
-      }
-      console.error(err);
+      if (err.response?.status === 401) logout();
+      setError("Erro ao carregar histórico.");
     } finally {
       setIsLoading(false);
     }
   }, [logout]);
 
   useEffect(() => {
-    // polling para dados em tempo real
     const intervalId = setInterval(async () => {
       try {
         const data = await getLatestTelemetry();
         setLatestData(data);
+        
+        // SÓ adiciona ao gráfico se o dado não for velho
+        if (data && !data.isOld) {
+          setHistoricalData(prev => {
+            const lastPoint = prev[prev.length - 1];
+            // Evita duplicatas se o polling for mais rápido que o banco
+            if (lastPoint && lastPoint.time === data.time) return prev;
+            return [...prev.slice(-50), data]; // Mantém 50 pontos
+          });
+        }
       } catch (err) {
-        console.error("Erro na busca em tempo real:", err);
+        console.error("Erro real-time:", err);
+      } finally {
+        setIsLoading(false);
       }
     }, 2000);
 

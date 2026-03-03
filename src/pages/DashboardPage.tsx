@@ -1,9 +1,7 @@
-// DASHBOARD PAGE
 import { useState, useEffect, useRef } from 'react';
 import PitCallButton from '../components/PitCallButton';
 import { useAuth } from '../context/AuthContext';
 import { useTelemetryData } from '../hooks/useTelemetryData';
-//import { sendPitCallCommand } from '../services/telemetryService';
 import GaugeComponent from '../components/GaugeComponent';
 import AlertsPanel from '../components/AlertsPanel';
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
@@ -15,82 +13,44 @@ import logo from '../assets/logo.png';
 
 export default function DashboardPage() {
   const { user, role, logout } = useAuth();
-
   const [startDate, setStartDate] = useState(new Date(Date.now() - 60 * 60 * 1000));
   const [endDate, setEndDate] = useState(new Date());
-
-  const { latestData, historicalData, fetchHistory } = useTelemetryData();
-
+  const { latestData, historicalData, fetchHistory, isLoading } = useTelemetryData();
   const [visibleSensors, setVisibleSensors] = useState<string[]>(presets.powertrain);
-
   const [isRealtime, setIsRealtime] = useState(false);
   const realtimeIntervalRef = useRef<number | null>(null);
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
 
+  useEffect(() => {
+    if (role === "juiz") setIsRealtime(false);
+  }, [role]);
 
   useEffect(() => {
-    if (role === "juiz") {
-      setIsRealtime(false);
+    if (isRealtime) {
+      const id = window.setInterval(() => {
+        const now = new Date();
+        const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
+        setStartDate(tenMinutesAgo);
+        setEndDate(now);
+        fetchHistory(tenMinutesAgo, now);
+      }, 5000);
+      realtimeIntervalRef.current = id;
+      return () => {
+        if (realtimeIntervalRef.current) window.clearInterval(realtimeIntervalRef.current);
+      };
     }
-  }, [role]);// garante que juiz nunca esteja em realtime
-
-
-  useEffect(() => {
-  // ativa/deativa o intervalo quando isRealtime muda
-  if (isRealtime) {
-    // intervalo a cada 5 segundos (ajuste se quiser mais/menos frequente)
-    const id = window.setInterval(() => {
-      const now = new Date();
-      const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
-      setStartDate(tenMinutesAgo);
-      setEndDate(now);
-      fetchHistory(tenMinutesAgo, now);
-    }, 5000);
-    realtimeIntervalRef.current = id;
-    return () => {
-      if (realtimeIntervalRef.current) {
-        window.clearInterval(realtimeIntervalRef.current);
-        realtimeIntervalRef.current = null;
-      }
-    };
-  } else {
-    // se desativou, limpa qualquer intervalo
-    if (realtimeIntervalRef.current) {
-      window.clearInterval(realtimeIntervalRef.current);
-      realtimeIntervalRef.current = null;
-    }
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [isRealtime, fetchHistory]);
-
-
-
+  }, [isRealtime, fetchHistory]);
 
   useEffect(() => {
-    // Limitar histórico para juízes: 7 dias
-    if (role === 'juiz') {
-      const now = new Date();
-      setStartDate(new Date(now.getTime() -   3 * 60 * 1000)); // 7 dias atrás
-      setEndDate(now);
-      fetchHistory(new Date(now.getTime() - 3 * 60 * 1000), now);
-    } else {
-      fetchHistory(startDate, endDate);
-    }
-  }, [fetchHistory, role]);
+    // SÓ adiciona ao array de gráficos se o dado NÃO for velho
+    if (!latestData || !latestData.time || latestData.isOld) return;
 
-
-  useEffect(() => {
-  if (!latestData || !latestData.time) return;
-
-  setRealtimeData(prev => {
-    const MAX = 300;
-    const updated = [...prev, latestData];
-    return updated.slice(-MAX);
-  });
-}, [latestData]);
-
-
-
+    setRealtimeData(prev => {
+      const MAX = 300;
+      const updated = [...prev, latestData];
+      return updated.slice(-MAX);
+    });
+  }, [latestData]);
 
   const handleSensorToggle = (sensorId: string) => {
     setVisibleSensors(prev =>
@@ -101,69 +61,25 @@ export default function DashboardPage() {
   const handlePresetChange = (presetName: string) => {
     if (presets[presetName]) {
       setVisibleSensors(presets[presetName]);
-      setIsRealtime(true); // Ativa modo realtime ao mudar preset
+      setIsRealtime(true);
     }
   };
 
   const handleFetchDataByDate = () => {
-  // se estivermos em modo realtime, pare
-  if (isRealtime) {
-    setIsRealtime(false);
-  }
-  // juízes: você já tem proteção para não alterar período
-  if (role === 'juiz') return;
-  fetchHistory(startDate, endDate);
-};
-
-
-  /*const handlePitCall = async () => {
-    try {
-      const response = await sendPitCallCommand();
-      alert(response.message);
-    } catch (err) {
-      alert('Erro ao enviar comando para o box.');
-      console.error(err);
-    }
-  };*/
+    if (isRealtime) setIsRealtime(false);
+    if (role === 'juiz') return;
+    fetchHistory(startDate, endDate);
+  };
 
   const widgetsToShow = sensorConfig.filter(s => visibleSensors.includes(s.id));
 
   const renderContent = () => {
     if (!widgetsToShow || widgetsToShow.length === 0) {
-  return (
-    <Typography sx={{ color: "#ccc", textAlign: "center", mt: 4 }}>
-      Nenhum sensor selecionado.
-    </Typography>
-  );
-}
+      return <Typography sx={{ color: "#ccc", textAlign: "center", mt: 4 }}>Nenhum sensor selecionado.</Typography>;
+    }
 
-const chartData = isRealtime ? realtimeData : historicalData;
+    const chartData = isRealtime ? realtimeData : historicalData;
 
-if (!chartData || chartData.length === 0) {
-  return (
-    <>
-      <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc' }}>
-        Mostradores
-      </Typography>
-
-      <Box sx={styles.widgetsContainer}>
-        {widgetsToShow.map(widget => (
-          <GaugeComponent
-            key={widget.id + '-gauge'}
-            label={widget.label}
-            value={latestData?.[widget.id] as number ?? 0}
-            unit={widget.unit}
-            maxValue={widget.maxValue || 100}
-          />
-        ))}
-      </Box>
-
-      <Typography sx={{ color: "#ccc", textAlign: "center", mt: 4 }}>
-        Carregando dados...
-      </Typography>
-    </>
-  );
-}
     return (
       <>
         <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc' }}>Mostradores</Typography>
@@ -175,46 +91,43 @@ if (!chartData || chartData.length === 0) {
               value={latestData?.[widget.id] as number ?? 0}
               unit={widget.unit}
               maxValue={widget.maxValue || 100}
+              isOld={latestData?.isOld} // Passa o status de conexão
             />
           ))}
         </Box>
 
-        <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc' }}>Gráficos Históricos</Typography>
+        <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc' }}>
+          {isRealtime ? "Gráficos em Tempo Real" : "Gráficos Históricos"}
+        </Typography>
+        
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           {widgetsToShow.map((chart, index) => {
             const isLastChart = index === widgetsToShow.length - 1;
             return (
-              <Box key={chart.id + '-graph'} sx={{ width: '100%', height: isLastChart ? 220 : 200 }}>
-                {chartData.length > 0 && (
+              <Box key={chart.id + '-graph'} sx={{ width: '100%', height: isLastChart ? 220 : 200, mb: 2 }}>
                 <ResponsiveContainer>
-                  <LineChart
-                    data={isRealtime ? realtimeData : historicalData}
-                    syncId="telemetrySync"
-                    margin={{ top: 10, right: 30, left: 0, bottom: isLastChart ? 5 : 0 }}
-                  >
+                  <LineChart data={chartData} syncId="telemetrySync">
                     <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                    {isLastChart && (
-                      <XAxis
-                        dataKey="time"
-                        tickFormatter={(time) => new Date(time).toLocaleTimeString()}
-                        stroke="#ccc"
-                      />
-                    )}
+                    <XAxis 
+                      dataKey="time" 
+                      tickFormatter={(t) => new Date(t).toLocaleTimeString()} 
+                      stroke="#ccc" 
+                      hide={!isLastChart}
+                    />
                     <YAxis stroke="#ccc" domain={['auto', 'auto']} />
                     <Tooltip contentStyle={{ backgroundColor: '#222', color: '#ccc' }} />
                     <Legend wrapperStyle={{ color: '#ccc' }} />
-                    <Line
-                      type="monotone"
-                      dataKey={chart.id}
-                      name={chart.label}
-                      stroke={chart.color}
-                      dot={false}
-                      isAnimationActive={false}
-                      strokeWidth={2}
+                    <Line 
+                      type="monotone" 
+                      dataKey={chart.id} 
+                      name={chart.label} 
+                      stroke={chart.color} 
+                      dot={false} 
+                      isAnimationActive={false} 
+                      strokeWidth={2} 
                     />
                   </LineChart>
                 </ResponsiveContainer>
-                )}
               </Box>
             );
           })}
@@ -225,131 +138,35 @@ if (!chartData || chartData.length === 0) {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', color: '#131E33' }}>
-      {/* Fundo com logo */}
-      <div
-        style={{
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#131E33', // Cor sólida primeiro
-    backgroundImage: `url(${logo})`,
-    backgroundSize: '90%',  // Mantém proporção da logo
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center top 200px', // move a imagem um pouco pra baixo se quiser
-    filter: 'blur(3px)',
-    opacity: 1,
-    zIndex: 0,
-  }}
-      />
-
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', minHeight: '100vh', color: '#131E33' }}>
-        {/* Sidebar */}
+      <div style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: '#131E33', backgroundImage: `url(${logo})`, backgroundSize: '90%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center top 200px', filter: 'blur(3px)', opacity: 0.2, zIndex: 0 }} />
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', minHeight: '100vh' }}>
         <aside style={{ ...styles.sidebar, color: '#ccc' }}>
-          <Typography variant="h6" sx={{ color: '#ccc' }}>Controles</Typography>
-
-          {/* Comandos e presets visíveis apenas para integrantes */}
+          <Typography variant="h6">Controles</Typography>
           {role === 'integrante' && (
             <>
               <PitCallButton />
-
-
-              <Typography variant="subtitle1" sx={{ ...styles.sectionTitle, color: '#ccc' }}>Período dos Gráficos</Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
-                <div>
-                  <label style={{ color: '#ccc' }}>Início:</label>
-                  <DatePicker
-                    selected={startDate}
-                    onChange={(date: Date | null) => date && setStartDate(date)}
-                    showTimeSelect
-                    dateFormat="dd/MM/yyyy HH:mm"
-                    customInput={<input style={styles.datePickerInput} />}
-                  />
-                </div>
-                <div>
-                  <label style={{ color: '#ccc' }}>Fim:</label>
-                  <DatePicker
-                    selected={endDate}
-                    onChange={(date: Date | null) => date && setEndDate(date)}
-                    showTimeSelect
-                    dateFormat="dd/MM/yyyy HH:mm"
-                    customInput={<input style={styles.datePickerInput} />}
-                  />
-                </div>
-                <Button fullWidth variant="outlined" onClick={handleFetchDataByDate} sx={{ color: '#ccc', borderColor: '#ccc' }}>
-                  Buscar Período
-                </Button>
-
-                {/* Botão Últimos 3 minutos */}
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={() => {
-                    const now = new Date();
-                    const threeMinutesAgo = new Date(now.getTime() - 3 * 60 * 1000);
-                     // Atualiza período atual
-                      setStartDate(threeMinutesAgo);
-                      setEndDate(now);
-
-                    // Faz busca imediata
-                      fetchHistory(threeMinutesAgo, now);
-
-                    // Ativa modo tempo real (refresh automático)
-                      setIsRealtime(true);
-                  }}
-                  sx={{ color: '#ccc', borderColor: '#ccc' }}
-                >
-                  Últimos 3 minutos
-                </Button>
-              </Box>
-
-              <Typography variant="subtitle1" sx={{ ...styles.sectionTitle, color: '#ccc' }}>Presets</Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Button fullWidth variant="outlined" onClick={() => handlePresetChange('powertrain')} sx={{ color: '#ccc', borderColor: '#ccc' }}>Powertrain</Button>
-                <Button fullWidth variant="outlined" onClick={() => handlePresetChange('freios')} sx={{ color: '#ccc', borderColor: '#ccc' }}>Freios</Button>
-                <Button fullWidth variant="outlined" onClick={() => handlePresetChange('suspensao')} sx={{ color: '#ccc', borderColor: '#ccc' }}>Suspensão</Button>
-                <Button fullWidth variant="outlined" onClick={() => handlePresetChange('todos')} sx={{ color: '#ccc', borderColor: '#ccc' }}>Todos</Button>
-              </Box>
+              <Typography variant="subtitle1" sx={{ mt: 2 }}>Período</Typography>
+              <DatePicker selected={startDate} onChange={(d) => d && setStartDate(d)} showTimeSelect dateFormat="dd/MM/yyyy HH:mm" customInput={<input style={styles.datePickerInput} />} />
+              <DatePicker selected={endDate} onChange={(d) => d && setEndDate(d)} showTimeSelect dateFormat="dd/MM/yyyy HH:mm" customInput={<input style={styles.datePickerInput} />} />
+              <Button fullWidth variant="outlined" onClick={handleFetchDataByDate} sx={{ mt: 1, color: '#ccc', borderColor: '#ccc' }}>Buscar</Button>
+              <Button fullWidth variant="outlined" onClick={() => setIsRealtime(true)} sx={{ mt: 1, color: '#ccc', borderColor: '#ccc' }}>Tempo Real</Button>
+              <Typography variant="subtitle1" sx={{ mt: 2 }}>Presets</Typography>
+              {['powertrain', 'freios', 'suspensao', 'todos'].map(p => (
+                <Button key={p} fullWidth variant="outlined" onClick={() => handlePresetChange(p)} sx={{ mt: 0.5, color: '#ccc', borderColor: '#ccc' }}>{p}</Button>
+              ))}
             </>
           )}
-
-          <Typography variant="subtitle1" sx={{ ...styles.sectionTitle, color: '#ccc' }}>Sensores Visíveis</Typography>
-          {sensorConfig.map(sensor => (
-            <Box key={sensor.id} sx={{ ...styles.checkboxLabel, color: '#ccc' }}>
-              <input
-                type="checkbox"
-                id={sensor.id}
-                checked={visibleSensors.includes(sensor.id)}
-                onChange={() => handleSensorToggle(sensor.id)}
-                style={{ marginRight: '10px' }}
-              />
-              <label htmlFor={sensor.id} style={{ color: '#ccc' }}>{sensor.label}</label>
-            </Box>
-          ))}
         </aside>
-
-        {/* Main content */}
-        <div style={{ ...styles.mainContent, color: '#ccc' }}>
+        <div style={styles.mainContent}>
           <header style={styles.header}>
-            <Typography variant="h4" sx={{ color: '#ccc' }}>Dashboard Imperador</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              {/* Export visível apenas para integrantes */}
-              {role === 'integrante' && (
-                <Link to="/export">
-                  <Button variant="outlined" sx={{ color: '#ccc', borderColor: '#ccc' }}>Exportar Dados</Button>
-                </Link>
-              )}
-              <Typography sx={{ color: '#ccc' }}>{user?.email}</Typography>
-              <Button variant="outlined" color="error" onClick={logout} sx={{ color: 'error', borderColor: 'error' }}>Sair</Button>
+            <Typography variant="h4">Dashboard Imperador</Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Typography>{user?.email}</Typography>
+              <Button variant="outlined" color="error" onClick={logout}>Sair</Button>
             </Box>
           </header>
-
           <main>
-            <Box sx={styles.liveDataContainer}>
-              <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc' }}>Alertas</Typography>
-              <AlertsPanel data={latestData} />
-            </Box>
+            <AlertsPanel data={latestData} />
             {renderContent()}
           </main>
         </div>
