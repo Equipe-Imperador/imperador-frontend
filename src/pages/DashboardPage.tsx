@@ -6,18 +6,18 @@ import GaugeComponent from '../components/GaugeComponent';
 import AlertsPanel from '../components/AlertsPanel';
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
 import DatePicker from 'react-datepicker';
-import { Link } from 'react-router-dom';
 import { styles, sensorConfig, presets } from '../config/dashboardConfig';
 import { Box, Button, Typography } from '@mui/material';
 import logo from '../assets/logo.png';
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function DashboardPage() {
   const { user, role, logout } = useAuth();
   const [startDate, setStartDate] = useState(new Date(Date.now() - 60 * 60 * 1000));
   const [endDate, setEndDate] = useState(new Date());
-  const { latestData, historicalData, fetchHistory, isLoading } = useTelemetryData();
+  const { latestData, historicalData, fetchHistory } = useTelemetryData();
   const [visibleSensors, setVisibleSensors] = useState<string[]>(presets.powertrain);
-  const [isRealtime, setIsRealtime] = useState(false);
+  const [isRealtime, setIsRealtime] = useState(true);
   const realtimeIntervalRef = useRef<number | null>(null);
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
 
@@ -42,7 +42,6 @@ export default function DashboardPage() {
   }, [isRealtime, fetchHistory]);
 
   useEffect(() => {
-    // SÓ adiciona ao array de gráficos se o dado NÃO for velho
     if (!latestData || !latestData.time || latestData.isOld) return;
 
     setRealtimeData(prev => {
@@ -51,12 +50,6 @@ export default function DashboardPage() {
       return updated.slice(-MAX);
     });
   }, [latestData]);
-
-  const handleSensorToggle = (sensorId: string) => {
-    setVisibleSensors(prev =>
-      prev.includes(sensorId) ? prev.filter(id => id !== sensorId) : [...prev, sensorId]
-    );
-  };
 
   const handlePresetChange = (presetName: string) => {
     if (presets[presetName]) {
@@ -71,7 +64,7 @@ export default function DashboardPage() {
     fetchHistory(startDate, endDate);
   };
 
-  const widgetsToShow = sensorConfig.filter(s => visibleSensors.includes(s.id));
+  const widgetsToShow = sensorConfig.filter((s: any) => visibleSensors.includes(s.id));
 
   const renderContent = () => {
     if (!widgetsToShow || widgetsToShow.length === 0) {
@@ -82,29 +75,30 @@ export default function DashboardPage() {
 
     return (
       <>
-        <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc' }}>Mostradores</Typography>
+        <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc', mb: 2 }}>Mostradores</Typography>
         <Box sx={styles.widgetsContainer}>
-          {widgetsToShow.map(widget => (
+          {widgetsToShow.map((widget: any) => (
             <GaugeComponent
               key={widget.id + '-gauge'}
               label={widget.label}
               value={latestData?.[widget.id] as number ?? 0}
               unit={widget.unit}
               maxValue={widget.maxValue || 100}
-              isOld={latestData?.isOld} // Passa o status de conexão
+              isOld={latestData?.isOld}
             />
           ))}
         </Box>
 
-        <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc' }}>
+        <Typography variant="h6" sx={{ ...styles.sectionTitle, color: '#ccc', mt: 4, mb: 2 }}>
           {isRealtime ? "Gráficos em Tempo Real" : "Gráficos Históricos"}
         </Typography>
         
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          {widgetsToShow.map((chart, index) => {
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {widgetsToShow.map((chart: any, index: number) => {
             const isLastChart = index === widgetsToShow.length - 1;
             return (
-              <Box key={chart.id + '-graph'} sx={{ width: '100%', height: isLastChart ? 220 : 200, mb: 2 }}>
+              <Box key={chart.id + '-graph'} sx={{ width: '100%', height: isLastChart ? 220 : 200, backgroundColor: 'rgba(0,0,0,0.2)', p: 2, borderRadius: 1 }}>
+                <Typography sx={{ color: chart.color, fontSize: '0.9rem', mb: 1 }}>{chart.label}</Typography>
                 <ResponsiveContainer>
                   <LineChart data={chartData} syncId="telemetrySync">
                     <CartesianGrid strokeDasharray="3 3" stroke="#444" />
@@ -115,8 +109,8 @@ export default function DashboardPage() {
                       hide={!isLastChart}
                     />
                     <YAxis stroke="#ccc" domain={['auto', 'auto']} />
-                    <Tooltip contentStyle={{ backgroundColor: '#222', color: '#ccc' }} />
-                    <Legend wrapperStyle={{ color: '#ccc' }} />
+                    <Tooltip contentStyle={{ backgroundColor: '#222', border: '1px solid #444', color: '#ccc' }} />
+                    <Legend wrapperStyle={{ color: '#ccc', fontSize: '0.8rem' }} />
                     <Line 
                       type="monotone" 
                       dataKey={chart.id} 
@@ -137,32 +131,47 @@ export default function DashboardPage() {
   };
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', color: '#131E33' }}>
-      <div style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: '#131E33', backgroundImage: `url(${logo})`, backgroundSize: '90%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center top 200px', filter: 'blur(3px)', opacity: 0.2, zIndex: 0 }} />
+    <div style={{ position: 'relative', minHeight: '100vh', color: '#ccc', backgroundColor: '#131E33' }}>
+      <div style={{ position: 'absolute', width: '100%', height: '100%', backgroundImage: `url(${logo})`, backgroundSize: '40%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', filter: 'blur(3px)', opacity: 0.05, zIndex: 0 }} />
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', minHeight: '100vh' }}>
-        <aside style={{ ...styles.sidebar, color: '#ccc' }}>
-          <Typography variant="h6">Controles</Typography>
+        <aside style={{ ...styles.sidebar, width: '260px', borderRight: '1px solid #333', padding: '20px' }}>
+          <Typography variant="h6" sx={{ mb: 3 }}>Controles</Typography>
           {role === 'integrante' && (
             <>
               <PitCallButton />
-              <Typography variant="subtitle1" sx={{ mt: 2 }}>Período</Typography>
-              <DatePicker selected={startDate} onChange={(d) => d && setStartDate(d)} showTimeSelect dateFormat="dd/MM/yyyy HH:mm" customInput={<input style={styles.datePickerInput} />} />
-              <DatePicker selected={endDate} onChange={(d) => d && setEndDate(d)} showTimeSelect dateFormat="dd/MM/yyyy HH:mm" customInput={<input style={styles.datePickerInput} />} />
-              <Button fullWidth variant="outlined" onClick={handleFetchDataByDate} sx={{ mt: 1, color: '#ccc', borderColor: '#ccc' }}>Buscar</Button>
-              <Button fullWidth variant="outlined" onClick={() => setIsRealtime(true)} sx={{ mt: 1, color: '#ccc', borderColor: '#ccc' }}>Tempo Real</Button>
-              <Typography variant="subtitle1" sx={{ mt: 2 }}>Presets</Typography>
+              <Typography variant="subtitle2" sx={{ mt: 3, mb: 1 }}>Período Histórico</Typography>
+              <DatePicker 
+                selected={startDate} 
+                onChange={(d) => d && setStartDate(d)} 
+                showTimeSelect 
+                dateFormat="dd/MM/yyyy HH:mm" 
+                popperPlacement="bottom-start"
+                customInput={<input style={{ ...styles.datePickerInput, width: '100%', marginBottom: '10px' }} />} 
+              />
+              <DatePicker 
+                selected={endDate} 
+                onChange={(d) => d && setEndDate(d)} 
+                showTimeSelect 
+                dateFormat="dd/MM/yyyy HH:mm" 
+                popperPlacement="bottom-start"
+                customInput={<input style={{ ...styles.datePickerInput, width: '100%' }} />} 
+              />
+              <Button fullWidth variant="contained" onClick={handleFetchDataByDate} sx={{ mt: 2, mb: 1, backgroundColor: '#222' }}>Buscar</Button>
+              <Button fullWidth variant="outlined" onClick={() => setIsRealtime(true)} sx={{ mb: 4, color: '#FFD700', borderColor: '#FFD700' }}>Tempo Real</Button>
+              
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>Presets</Typography>
               {['powertrain', 'freios', 'suspensao', 'todos'].map(p => (
-                <Button key={p} fullWidth variant="outlined" onClick={() => handlePresetChange(p)} sx={{ mt: 0.5, color: '#ccc', borderColor: '#ccc' }}>{p}</Button>
+                <Button key={p} fullWidth variant="outlined" onClick={() => handlePresetChange(p)} sx={{ mt: 0.5, color: '#ccc', borderColor: '#444' }}>{p}</Button>
               ))}
             </>
           )}
         </aside>
-        <div style={styles.mainContent}>
-          <header style={styles.header}>
+        <div style={{ ...styles.mainContent, flexGrow: 1, padding: '25px' }}>
+          <header style={{ ...styles.header, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
             <Typography variant="h4">Dashboard Imperador</Typography>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Typography>{user?.email}</Typography>
-              <Button variant="outlined" color="error" onClick={logout}>Sair</Button>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="body2">{user?.email}</Typography>
+              <Button variant="outlined" color="error" size="small" onClick={logout}>Sair</Button>
             </Box>
           </header>
           <main>

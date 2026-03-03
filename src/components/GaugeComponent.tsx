@@ -28,7 +28,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   unit: { fontSize: '0.8em', color: '#AAA' }
 };
 
-const GaugeComponent = ({ label, value, unit, isOld, maxValue = 100 }: GaugeProps) => {
+const GaugeComponent = ({ label, value, unit, isOld }: GaugeProps) => {
   // Converte para número por segurança e trata strings/nulos
   const numericValue = typeof value === 'number' ? value : parseFloat(value as any);
   const displayValue = isNaN(numericValue) ? 0 : numericValue;

@@ -1,18 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTelemetryData } from '../../hooks/useTelemetryData';
 import GaugeComponent from '../../components/GaugeComponent';
 import AlertsPanel from '../../components/AlertsPanel';
-import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
-import { useNavigate } from 'react-router-dom';
+import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line } from 'recharts';
+//import { useNavigate } from 'react-router-dom';
 import { sensorConfig, presets } from '../../config/dashboardConfig';
 import { Box, Button, Typography } from '@mui/material';
 import PitCallButton from '../../components/PitCallButton';
 
 export default function MobileDashboardPage() {
-  const { user, logout } = useAuth();
-  const role = user?.role;
-  const navigate = useNavigate();
+  const {logout } = useAuth();
+ // const role = user?.role;
+ // const navigate = useNavigate();
   const { latestData, historicalData, fetchHistory } = useTelemetryData();
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
   const [visibleSensors, setVisibleSensors] = useState<string[]>(presets.powertrain);
