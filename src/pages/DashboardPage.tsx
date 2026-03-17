@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import DownloadIcon from '@mui/icons-material/Download';
 import PitCallButton from '../components/PitCallButton';
 import { useAuth } from '../context/AuthContext';
 import { useTelemetryData } from '../hooks/useTelemetryData';
@@ -170,6 +172,20 @@ export default function DashboardPage() {
           <header style={{ ...styles.header, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
             <Typography variant="h4">Dashboard Imperador</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              
+              {role === 'integrante' && (
+                <Button 
+                  component={RouterLink} 
+                  to="/export" 
+                  variant="outlined" 
+                  color="info" 
+                  size="small"
+                  startIcon={<DownloadIcon />}
+                >
+                  Exportar Dados
+                </Button>
+              )}
+
               <Typography variant="body2">{user?.email}</Typography>
               <Button variant="outlined" color="error" size="small" onClick={logout}>Sair</Button>
             </Box>

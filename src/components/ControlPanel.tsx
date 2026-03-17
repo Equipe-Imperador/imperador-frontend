@@ -1,4 +1,3 @@
-// src/components/ControlPanel.tsx
 import { List, ListItemButton, ListItemText, Typography, Divider, Checkbox, ListItem } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -6,6 +5,8 @@ import DownloadIcon from '@mui/icons-material/Download';
 import SpeedIcon from '@mui/icons-material/Speed';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import { sensorConfig } from '../config/dashboardConfig';
+// Importando o contexto de Auth para proteger o botão de exportação
+import { useAuth } from '../context/AuthContext';
 
 interface ControlPanelProps {
   onPresetChange?: (preset: string) => void;
@@ -15,6 +16,7 @@ interface ControlPanelProps {
 
 const ControlPanel = ({ onPresetChange, visibleSensors, onSensorToggle }: ControlPanelProps) => {
   const location = useLocation();
+  const { role } = useAuth(); // Pegando o nível de acesso
 
   return (
     <>
@@ -22,8 +24,20 @@ const ControlPanel = ({ onPresetChange, visibleSensors, onSensorToggle }: Contro
       <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.12)' }} />
       <List>
         <Typography sx={{ p: 2, color: 'gray' }}>Navegação</Typography>
-        <ListItemButton component={RouterLink} to="/"><DashboardIcon sx={{ mr: 1 }} /><ListItemText primary="Dashboard" /></ListItemButton>
-        <ListItemButton component={RouterLink} to="/export"><DownloadIcon sx={{ mr: 1 }} /><ListItemText primary="Exportar Dados" /></ListItemButton>
+        
+        <ListItemButton component={RouterLink} to="/">
+          <DashboardIcon sx={{ mr: 1 }} />
+          <ListItemText primary="Dashboard" />
+        </ListItemButton>
+        
+        {/* Aqui está o botão de Exportar, agora protegido para apenas 'integrantes' verem */}
+        {role === 'integrante' && (
+          <ListItemButton component={RouterLink} to="/export">
+            <DownloadIcon sx={{ mr: 1 }} />
+            <ListItemText primary="Exportar Dados" />
+          </ListItemButton>
+        )}
+
       </List>
       <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.12)' }} />
       {location.pathname === '/' && onPresetChange && visibleSensors && onSensorToggle && (
