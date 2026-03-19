@@ -1,7 +1,7 @@
 <div align="center">
-
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1a1a2e,50:c62a2a,100:e96c00&height=180&section=header&text=Imperador%20Frontend&fontSize=40&fontColor=ffffff&fontAlignY=38&desc=Real-Time%20Telemetry%20Dashboard%20%7C%20Baja%20SAE%20Imperador&descAlignY=58&descSize=16&animation=fadeIn" width="100%"/>
-
+  
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0d1b2a,50:8B6914,100:C9A84C&height=180&section=header&text=Imperador%20Frontend&fontSize=40&fontColor=ffffff&fontAlignY=38&desc=Real-Time%20Telemetry%20Dashboard%20%7C%20Baja%20SAE%20Imperador&descAlignY=58&descSize=16&animation=fadeIn" width="100%"/>
+  
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
