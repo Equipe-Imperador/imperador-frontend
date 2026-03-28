@@ -4,15 +4,12 @@ import { useTelemetryData } from '../../hooks/useTelemetryData';
 import GaugeComponent from '../../components/GaugeComponent';
 import AlertsPanel from '../../components/AlertsPanel';
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line } from 'recharts';
-//import { useNavigate } from 'react-router-dom';
 import { sensorConfig, presets } from '../../config/dashboardConfig';
 import { Box, Button, Typography } from '@mui/material';
 import PitCallButton from '../../components/PitCallButton';
 
 export default function MobileDashboardPage() {
-  const {logout } = useAuth();
- // const role = user?.role;
- // const navigate = useNavigate();
+  const { logout } = useAuth();
   const { latestData, historicalData, fetchHistory } = useTelemetryData();
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
   const [visibleSensors, setVisibleSensors] = useState<string[]>(presets.powertrain);
@@ -30,7 +27,6 @@ export default function MobileDashboardPage() {
   }, [isRealtime, fetchHistory]);
 
   useEffect(() => {
-    // Filtra dados velhos para não poluir o gráfico
     if (!latestData || !latestData.time || latestData.isOld) return;
     setRealtimeData(prev => [...prev.slice(-100), latestData]);
   }, [latestData]);
@@ -49,9 +45,17 @@ export default function MobileDashboardPage() {
         <Button fullWidth variant="outlined" onClick={() => setIsRealtime(!isRealtime)} sx={{ mt: 1, color: isRealtime ? '#39c21d' : '#ccc' }}>
           {isRealtime ? "Tempo Real Ativo" : "Ativar Tempo Real"}
         </Button>
+        
+        {/* PRIMEIRA LINHA DE PRESETS */}
         <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
           <Button fullWidth variant="outlined" onClick={() => setVisibleSensors(presets.powertrain)} sx={{ color: '#ccc' }}>Motor</Button>
           <Button fullWidth variant="outlined" onClick={() => setVisibleSensors(presets.freios)} sx={{ color: '#ccc' }}>Freios</Button>
+        </Box>
+        
+        {/* SEGUNDA LINHA DE PRESETS (ADICIONADA) */}
+        <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+          <Button fullWidth variant="outlined" onClick={() => setVisibleSensors(presets.suspensao)} sx={{ color: '#ccc' }}>Suspensão</Button>
+          <Button fullWidth variant="outlined" onClick={() => setVisibleSensors(presets.todos)} sx={{ color: '#ccc' }}>Todos</Button>
         </Box>
       </Box>
 
@@ -64,7 +68,7 @@ export default function MobileDashboardPage() {
               label={widget.label}
               value={latestData?.[widget.id] as number ?? 0}
               unit={widget.unit}
-              isOld={latestData?.isOld} // Garante o feedback visual de offline
+              isOld={latestData?.isOld} 
             />
           </Box>
         ))}
