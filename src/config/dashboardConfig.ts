@@ -16,31 +16,31 @@ export interface WidgetConfig {
 // todos os sensores
 export const sensorConfig: WidgetConfig[] = [
   // --- DADOS DO MOTOR E TRANSMISSÃO ---
-  { id: 'rpm', label: 'RPM', unit: 'rpm', maxValue: 9000, color: '#f30000ff' },
-  { id: 'vel', label: 'Velocidade Tras.', unit: 'km/h', maxValue: 120, color: '#ffc400ff' },
-  { id: 'tCVT', label: 'Temp. CVT', unit: '°C', maxValue: 120, color: '#04f591ff' },
+  { id: 'rpm', label: 'RPM', unit: 'rpm', maxValue: 7000, color: '#f30000ff' },
+  { id: 'vel', label: 'Velocidade Tras.', unit: 'km/h', maxValue: 70, color: '#ffc400ff' },
+  { id: 'tcvt', label: 'Temp. CVT', unit: '°C', maxValue: 120, color: '#04f591ff' },
   { id: 'dif', label: 'Diferencial', unit: 'Status', maxValue: 1, color: '#a53c8cff' },
 
   // --- DADOS ELÉTRICOS ---
-  { id: 'vBat', label: 'Tensão Bateria', unit: 'V', maxValue: 15, color: '#ff7300' },
-  { id: 'tBat', label: 'Temp. Bateria', unit: '°C', maxValue: 100, color: '#FF6666' },
+  { id: 'vbat', label: 'Tensão Bateria', unit: 'V', maxValue: 25, color: '#ff7300' },
+  { id: 'tbat', label: 'Temp. Bateria', unit: '°C', maxValue: 100, color: '#FF6666' },
 
   // --- DINÂMICA E FREIOS ---
-  { id: 'pDiant', label: 'Pressão Freio Diant.', unit: 'bar', maxValue: 100, color: '#0088FE' },
-  { id: 'pTras', label: 'Pressão Freio Tras.', unit: 'bar', maxValue: 100, color: '#00C49F' },
-  { id: 'pCM', label: 'Pressão Cil. Mestre', unit: 'bar', maxValue: 100, color: '#80a53cff' },
-  { id: 'vLF', label: 'Velocidade Diant. Esq.', unit: 'km/h', maxValue: 120, color: '#FF66CC' },
-  { id: 'vRF', label: 'Velocidade Diant. Dir.', unit: 'km/h', maxValue: 120, color: '#66CCFF' },
+  { id: 'pdiant', label: 'Pressão Freio Diant.', unit: 'MPa', maxValue: 3000, color: '#0088FE' },
+  { id: 'ptras', label: 'Pressão Freio Tras.', unit: 'MPa', maxValue: 3000, color: '#00C49F' },
+  //{ id: 'pcm', label: 'Pressão Cil. Mestre', unit: 'bar', maxValue: 100, color: '#80a53cff' },
+  { id: 'vlf', label: 'Velocidade Diant. Esq.', unit: 'km/h', maxValue: 70, color: '#FF66CC' },
+  { id: 'vrf', label: 'Velocidade Diant. Dir.', unit: 'km/h', maxValue: 70, color: '#66CCFF' },
 
   // --- PEDAIS ---
-  { id: 'perT', label: 'Pedal Acelerador', unit: '%', maxValue: 100, color: '#3399FF' },
-  { id: 'perF', label: 'Curso Freio', unit: '%', maxValue: 100, color: '#FF3333' },
-  { id: 'pedF', label: 'Força Pedal Freio', unit: 'kgf', maxValue: 100, color: '#ff00ddff' }, 
+  { id: 'pert', label: 'Perinha Traseira', unit: '%', maxValue: 1, color: '#3399FF' },
+  { id: 'perf', label: 'Perinha Frontal', unit: '%', maxValue: 1, color: '#FF3333' },
+  { id: 'pedf', label: 'Curso Freio', unit: '%', maxValue: 100, color: '#ff00ddff' }, 
 
   // --- ACELERÔMETRO ---
-  { id: 'accX', label: 'Acelerômetro X', unit: 'g', maxValue: 10, color: '#33FFCC' },
-  { id: 'accY', label: 'Acelerômetro Y', unit: 'g', maxValue: 10, color: '#FFCC33' },
-  { id: 'accZ', label: 'Acelerômetro Z', unit: 'g', maxValue: 10, color: '#CCCCCC' },
+  { id: 'accx', label: 'Acelerômetro X', unit: 'g', maxValue: 10, color: '#33FFCC' },
+  { id: 'accy', label: 'Acelerômetro Y', unit: 'g', maxValue: 10, color: '#FFCC33' },
+  { id: 'accz', label: 'Acelerômetro Z', unit: 'g', maxValue: 10, color: '#CCCCCC' },
 
   // --- SENSORES ANTIGOS DESATIVADOS NO ESP32 ---
   //{ id: 'corrente_bateria', label: 'Corrente Bateria', unit: 'A', maxValue: 200, color: '#ff00ddff' },
@@ -57,33 +57,33 @@ export const presets: { [key: string]: string[] } = {
   powertrain: [
     'rpm', 
     'vel', 
-    'tCVT', 
-    'perT', 
+    'tcvt', 
+    'pert', 
     'dif' // O status do diferencial entra bem aqui
   ],
   freios: [
     'vel', 
-    'vLF', // Velocidade roda Esquerda (ajuda a ver travamento)
-    'vRF', // Velocidade roda Direita
-    'pDiant', 
-    'pTras', 
-    'pCM', // Pressão do Cilindro Mestre
-    'perT', 
-    'perF', // Curso do freio
-    'pedF'  // Força no pedal
+    'vlf', // Velocidade roda Esquerda (ajuda a ver travamento)
+    'vrf', // Velocidade roda Direita
+    'pdiant', 
+    'ptras', 
+    //'pcm', // Pressão do Cilindro Mestre
+    'pert', 
+    'perf', // Curso do freio
+    'pedf'  // Força no pedal
   ],
   suspensao: [
     'vel', 
-    'vLF', 
-    'vRF', 
-    'accX', 
-    'accY', 
-    'accZ'
+    'vlf', 
+    'vrf', 
+    'accx', 
+    'accy', 
+    'accz'
     // Giroscópio, ângulos e esterçamento foram removidos pois não vêm mais do ESP32
   ],
   eletrica: [
-    'vBat', 
-    'tBat'
+    'vbat', 
+    'tbat'
   ],
   todos: sensorConfig.map(s => s.id),
 };
