@@ -84,18 +84,13 @@ export const presets: { [key: string]: string[] } = {
     'accx', 
     'accy', 
     'accz'
-    'vlf', 
-    'vrf', 
-    'accx', 
-    'accy', 
-    'accz'
+    
     // Giroscópio, ângulos e esterçamento foram removidos pois não vêm mais do ESP32
   ],
   eletrica: [
     'vbat', 
-    'tbat'
-    'vbat', 
-    'tbat'
+    'tbat',
+
   ],
   todos: sensorConfig.map(s => s.id),
 };
