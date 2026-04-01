@@ -41,6 +41,9 @@ export const sensorConfig: WidgetConfig[] = [
   { id: 'accx', label: 'Acelerômetro X', unit: 'g', maxValue: 10, color: '#33FFCC' },
   { id: 'accy', label: 'Acelerômetro Y', unit: 'g', maxValue: 10, color: '#FFCC33' },
   { id: 'accz', label: 'Acelerômetro Z', unit: 'g', maxValue: 10, color: '#CCCCCC' },
+  { id: 'accx', label: 'Acelerômetro X', unit: 'g', maxValue: 10, color: '#33FFCC' },
+  { id: 'accy', label: 'Acelerômetro Y', unit: 'g', maxValue: 10, color: '#FFCC33' },
+  { id: 'accz', label: 'Acelerômetro Z', unit: 'g', maxValue: 10, color: '#CCCCCC' },
 
   // --- SENSORES ANTIGOS DESATIVADOS NO ESP32 ---
   //{ id: 'corrente_bateria', label: 'Corrente Bateria', unit: 'A', maxValue: 200, color: '#ff00ddff' },
@@ -57,6 +60,8 @@ export const presets: { [key: string]: string[] } = {
   powertrain: [
     'rpm', 
     'vel', 
+    'tcvt', 
+    'pert', 
     'tcvt', 
     'pert', 
     'dif' // O status do diferencial entra bem aqui
@@ -79,9 +84,16 @@ export const presets: { [key: string]: string[] } = {
     'accx', 
     'accy', 
     'accz'
+    'vlf', 
+    'vrf', 
+    'accx', 
+    'accy', 
+    'accz'
     // Giroscópio, ângulos e esterçamento foram removidos pois não vêm mais do ESP32
   ],
   eletrica: [
+    'vbat', 
+    'tbat'
     'vbat', 
     'tbat'
   ],
