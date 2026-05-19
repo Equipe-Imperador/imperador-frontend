@@ -1,3 +1,4 @@
+import React from 'react';
 // A interface que descreve um ponto de telemetria
 export interface TelemetryData {
   time: string;
@@ -38,9 +39,6 @@ export const sensorConfig: WidgetConfig[] = [
   { id: 'pedf', label: 'Curso Freio', unit: '%', maxValue: 100, color: '#ff00ddff' }, 
 
   // --- ACELERÔMETRO ---
-  { id: 'accx', label: 'Acelerômetro X', unit: 'g', maxValue: 10, color: '#33FFCC' },
-  { id: 'accy', label: 'Acelerômetro Y', unit: 'g', maxValue: 10, color: '#FFCC33' },
-  { id: 'accz', label: 'Acelerômetro Z', unit: 'g', maxValue: 10, color: '#CCCCCC' },
   { id: 'accx', label: 'Acelerômetro X', unit: 'g', maxValue: 10, color: '#33FFCC' },
   { id: 'accy', label: 'Acelerômetro Y', unit: 'g', maxValue: 10, color: '#FFCC33' },
   { id: 'accz', label: 'Acelerômetro Z', unit: 'g', maxValue: 10, color: '#CCCCCC' },

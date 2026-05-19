@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Typography, Box, Stack } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../config/apiConfig";
 
 const PitCallButton: React.FC = () => {
   const { role } = useAuth();
@@ -28,7 +29,7 @@ const PitCallButton: React.FC = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        "http://72.60.141.159:3000/api/telemetry/pit-call",
+        `${API_BASE_URL}/telemetry/pit-call`,
         {},
         getAuthHeaders()
       );

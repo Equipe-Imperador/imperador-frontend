@@ -4,6 +4,7 @@ import { Box, Button, TextField, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png'; // coloque sua logo em src/assets/logo.png
 import axios from 'axios';
+import { API_BASE_URL } from '../config/apiConfig';
 
 
 
@@ -22,7 +23,7 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post('/api/users/login', { email, password });
+      const response = await axios.post(`${API_BASE_URL}/users/login`, { email, password });
       
       localStorage.setItem("token", response.data.token);
       

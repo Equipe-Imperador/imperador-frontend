@@ -23,7 +23,7 @@ export default function MobileExportPage() {
     try {
       const startISO = startDate.toISOString();
       const endISO = endDate.toISOString();
-      const response = await fetch(`/api/telemetry/export?startDate=${startISO}&endDate=${endISO}&format=csv`,
+      const response = await fetch(`${API_BASE_URL}/telemetry/export?startDate=${startISO}&endDate=${endISO}&format=csv`,
         { headers: { Authorization: `Bearer ${token}` } });
       if (!response.ok) throw new Error('Falha CSV');
       const blob = await response.blob();
