@@ -32,7 +32,7 @@ function App() {
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // 🚫 Evita redirecionar durante login
+    //  Evita redirecionar durante login
     if (!isAuthenticated) return;
 
     const current = location.pathname;

@@ -8,6 +8,7 @@ import { sensorConfig } from '../../config/dashboardConfig';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { createRoot } from 'react-dom/client';
+import { API_BASE_URL } from '../../config/apiConfig';
 
 
 export default function MobileExportPage() {
